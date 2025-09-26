@@ -9,8 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -23,8 +21,9 @@ public class Empresa {
 
     @Id
     @GeneratedValue (strategy = GenerationType.UUID)
-    private UUID cnpj;
-    
+    private UUID cod_empresa;
+    private String razaoSocial;
+    private Endereco endereco;
     
 } 
     
