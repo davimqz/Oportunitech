@@ -26,5 +26,6 @@ public class Estudante {
 
     private String email;
     private List<String> telefones;
-    private String nome;
+    private String primeiroNome;
+    private String segundoNome;
 }
