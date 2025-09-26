@@ -9,23 +9,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.UUID;
 
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Setter
 @Getter
-@Table (name = "tb_funcionario")
+@Table (name = "tb_empresa")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Funcionario {
+public class Empresa {
 
     @Id
     @GeneratedValue (strategy = GenerationType.UUID)
-    private UUID cod_funcionario;
-    private String primeiroNome;
-    private String segundoNome;
-    private String email;
+    private UUID cnpj;
+    
     
 } 
     
+
