@@ -1,5 +1,8 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
+import java.time.LocalDate;
+import java.util.UUID;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,9 +13,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.util.UUID;
-
 @Entity
 @Setter
 @Getter
@@ -22,7 +22,7 @@ import java.util.UUID;
 public class Entrevista {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.UUID)
+    @GeneratedValue (strategy = GenerationType.AUTO)
     private UUID num_entrevista;
     private LocalDate data;
     
