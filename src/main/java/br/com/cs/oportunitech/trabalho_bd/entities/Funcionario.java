@@ -22,8 +22,8 @@ import lombok.Setter;
 public class Funcionario {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
-    private UUID cod_funcionario;
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Long cod_funcionario;
     private String primeiroNome;
     private String segundoNome;
     private String email;

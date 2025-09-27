@@ -21,8 +21,9 @@ import lombok.Setter;
 public class Curso {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
-    private UUID cod_curso;
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Long cod_curso;
+
     private String nome;
     private int duracao;
 } 

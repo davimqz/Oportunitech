@@ -27,8 +27,8 @@ const Home = () => {
         throw new Error(`Erro ${response.status}: ${errorText}`);
       }
 
-      const data = await response.json();
-      setResult(data);
+      const text = await response.text();
+      setResult(text);
     } catch (error) {
       console.error("Erro ao executar SQL:", error);
       setResult({ error: error.message || "Erro ao executar a consulta" });
@@ -61,7 +61,6 @@ const Home = () => {
     if (Array.isArray(result) && result.length > 0) {
       return (
         <div className="query-results">
-          <h3>Resultados da consulta:</h3>
           <table className="results-table">
             <thead>
               <tr>

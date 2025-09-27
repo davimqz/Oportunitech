@@ -22,8 +22,9 @@ import lombok.Setter;
 public class Vaga {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
-    private UUID cod_vaga;
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Long cod_vaga;
+
     private String titulo;
     private String descricao;
     private int carga_horaria;

@@ -1,7 +1,5 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
-import java.util.UUID;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,8 +19,8 @@ import lombok.Setter;
 public class Empresa {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
-    private UUID cod_empresa;
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Long cod_empresa;
     private String razaoSocial;
     private Endereco endereco;
     

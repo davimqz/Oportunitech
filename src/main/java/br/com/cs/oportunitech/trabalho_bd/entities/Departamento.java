@@ -1,7 +1,6 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
 import java.util.List;
-import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -27,8 +26,8 @@ import lombok.Setter;
 public class Departamento {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID cod_dep;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long cod_dep;
 
     private String nome;
 
