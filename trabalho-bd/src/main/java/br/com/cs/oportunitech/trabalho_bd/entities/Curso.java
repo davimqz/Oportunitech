@@ -1,5 +1,7 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
+import java.util.UUID;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.UUID;
 
 @Entity
 @Setter
@@ -20,7 +21,7 @@ import java.util.UUID;
 public class Curso {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.UUID)
+    @GeneratedValue (strategy = GenerationType.AUTO)
     private UUID cod_curso;
     private String nome;
     private int duracao;

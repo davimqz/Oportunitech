@@ -1,6 +1,6 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
-import java.util.UUID;
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,21 +12,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Entity
 @Setter
 @Getter
-@Table (name = "tb_funcionario")
+@Table (name = "tb_entrevista")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Funcionario {
+public class Entrevista {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
-    private UUID cod_funcionario;
-    private String primeiroNome;
-    private String segundoNome;
-    private String email;
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Long num_entrevista;
+    private LocalDate data;
     
 } 
     
+

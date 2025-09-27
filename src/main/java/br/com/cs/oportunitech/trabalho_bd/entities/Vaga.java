@@ -2,6 +2,7 @@ package br.com.cs.oportunitech.trabalho_bd.entities;
 
 import java.util.UUID;
 
+import br.com.cs.oportunitech.trabalho_bd.entities.Enum.Modalidade;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,21 +13,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Entity
 @Setter
 @Getter
-@Table (name = "tb_funcionario")
+@Table (name = "tb_vaga")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Funcionario {
+public class Vaga {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
-    private UUID cod_funcionario;
-    private String primeiroNome;
-    private String segundoNome;
-    private String email;
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    private Long cod_vaga;
+
+    private String titulo;
+    private String descricao;
+    private int carga_horaria;
+    private Modalidade modalidades;
     
 } 
     
+
+

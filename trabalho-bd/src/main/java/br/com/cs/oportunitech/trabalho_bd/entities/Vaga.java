@@ -1,5 +1,8 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
+import java.util.UUID;
+
+import br.com.cs.oportunitech.trabalho_bd.entities.Enum.Modalidade;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,9 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.UUID;
-
-import br.com.cs.oportunitech.trabalho_bd.entities.Enum.Modalidade;
 
 @Entity
 @Setter
@@ -22,7 +22,7 @@ import br.com.cs.oportunitech.trabalho_bd.entities.Enum.Modalidade;
 public class Vaga {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.UUID)
+    @GeneratedValue (strategy = GenerationType.AUTO)
     private UUID cod_vaga;
     private String titulo;
     private String descricao;
