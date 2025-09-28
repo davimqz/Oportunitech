@@ -67,3 +67,41 @@
     margin-top: 50px;
     gap: 20px;
 }
+
+.graficosTypes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.cabecalhoGrafico {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.boxType {
+  gap: 10px;
+  margin-top: 40px;
+  border: 1px solid white;
+  padding: 10px;
+  border-radius: 5px;
+  transition: 0.3s all ease-in-out;
+  cursor: pointer;
+}
+
+.boxType a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.boxType:hover {
+  background-color: #eee;
+color: #59335f;
+
+}
+
