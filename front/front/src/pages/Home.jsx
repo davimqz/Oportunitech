@@ -19,7 +19,7 @@ const Home = () => {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
-        body: sql.trim() // Sending as plain string, not JSON stringified
+        body: sql.trim() // enviando como string pura
       });
 
       if (!response.ok) {
@@ -27,8 +27,9 @@ const Home = () => {
         throw new Error(`Erro ${response.status}: ${errorText}`);
       }
 
-      const text = await response.text();
-      setResult(text);
+      // ✅ Corrigido para parsear JSON
+      const data = await response.json();
+      setResult(data);
     } catch (error) {
       console.error("Erro ao executar SQL:", error);
       setResult({ error: error.message || "Erro ao executar a consulta" });
@@ -45,15 +46,6 @@ const Home = () => {
         <div className="error-message">
           <h3>Erro:</h3>
           <p>{result.error}</p>
-        </div>
-      );
-    }
-
-    if (typeof result === 'string') {
-      return (
-        <div className="success-message">
-          <h3>Resultado:</h3>
-          <p>{result}</p>
         </div>
       );
     }
@@ -87,7 +79,7 @@ const Home = () => {
 
     if (Array.isArray(result) && result.length === 0) {
       return (
-        <div className="empty-result">
+        <div className="success-message">
           <p>Consulta executada com sucesso, mas nenhum resultado foi retornado.</p>
         </div>
       );
@@ -95,7 +87,6 @@ const Home = () => {
 
     return (
       <div className="json-result">
-        <h3>Resultado:</h3>
         <pre>{JSON.stringify(result, null, 2)}</pre>
       </div>
     );
@@ -131,6 +122,7 @@ const Home = () => {
       </div>
 
       <div className="tablesSql">
+        <h1>Resultado da Consulta</h1>
         {renderResult()}
       </div>
     </div>

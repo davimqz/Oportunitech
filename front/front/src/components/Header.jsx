@@ -18,19 +18,15 @@ const Header = () => {
             </div>
 
             <nav className="nav-desktop">
-              <a href="#" className="nav-link">Início</a>
-              <a href="#" className="nav-link">Graficos</a>
+              <div className="headerOption">
+                <i class="fa-solid fa-house"></i>
+                <a href="/" className="nav-link">Início</a>
+              </div>
+              <div className="headerOption">
+                <i class="fa-solid fa-chart-simple"></i>
+                <a href="/graficos" className="nav-link">Graficos</a>
+              </div>
             </nav>
-
-            {/* Desktop Actions */}
-            <div className="actions-desktop">
-              <button className="icon-button">
-                <User size={20} />
-              </button>
-              <button className="icon-button">
-                <ShoppingCart size={20} />
-              </button>
-            </div>
 
             {/* Mobile menu button */}
             <button
@@ -48,14 +44,6 @@ const Header = () => {
             <nav className="mobile-nav">
               <a href="#" className="mobile-nav-link">Início</a>
               <a href="#" className="mobile-nav-link">Graficos</a>
-              <div className="mobile-actions">
-                <button className="icon-button">
-                  <User size={20} />
-                </button>
-                <button className="icon-button">
-                  <ShoppingCart size={20} />
-                </button>
-              </div>
             </nav>
           </div>
         )}
