@@ -13,13 +13,13 @@ const Home = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/sql/execute", {
+      const response = await fetch("http://localhost:8080/api/consultas/personalizada", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
-        body: sql.trim() // Sending as plain string, not JSON stringified
+        body: JSON.stringify({ sql: sql.trim() })
       });
 
       if (!response.ok) {
