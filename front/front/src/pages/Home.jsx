@@ -122,6 +122,7 @@ const Home = () => {
       </div>
 
       <div className="tablesSql">
+        <h1>Resultado da Consulta</h1>
         {renderResult()}
       </div>
     </div>
