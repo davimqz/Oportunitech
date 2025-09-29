@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -104,6 +107,97 @@ public class SqlController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Erro ao matricular: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/curso")
+    public ResponseEntity<String> inserirCurso(@RequestBody Map<String, Object> body) {
+        try {
+            String sql = "INSERT INTO tb_curso (nome, duracao) VALUES (?, ?)";
+            int rows = jdbcTemplate.update(
+                sql,
+                body.get("nome"),
+                body.get("duracao")
+            );
+            return ResponseEntity.ok("Curso inserido com sucesso! Linhas afetadas: " + rows);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao inserir curso: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/cursos")
+    public ResponseEntity<List<Map<String, Object>>> listarCursos() {
+        try {
+            String sql = "SELECT * FROM tb_curso";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/curso/{id}")
+    public ResponseEntity<?> buscarCursoPorId(@PathVariable Long id) {
+        try {
+            String sql = "SELECT * FROM tb_curso WHERE cod_curso = ?";
+            Map<String, Object> result = jdbcTemplate.queryForMap(sql, id);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao buscar curso: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/curso/{id}")
+    public ResponseEntity<String> atualizarCurso(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        try {
+            String sql = "UPDATE tb_curso SET nome = ?, duracao = ? WHERE cod_curso = ?";
+            int rows = jdbcTemplate.update(
+                sql,
+                body.get("nome"),
+                body.get("duracao"),
+                id
+            );
+            if (rows > 0) {
+                return ResponseEntity.ok("Curso atualizado com sucesso! Linhas afetadas: " + rows);
+            } else {
+                return ResponseEntity.badRequest().body("Curso não encontrado");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao atualizar curso: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/curso/{id}")
+    public ResponseEntity<String> deletarCurso(@PathVariable Long id) {
+        try {
+            String sql = "DELETE FROM tb_curso WHERE cod_curso = ?";
+            int rows = jdbcTemplate.update(sql, id);
+            if (rows > 0) {
+                return ResponseEntity.ok("Curso deletado com sucesso! Linhas afetadas: " + rows);
+            } else {
+                return ResponseEntity.badRequest().body("Curso não encontrado");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao deletar curso: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/curso/{id}/estudantes")
+    public ResponseEntity<List<Map<String, Object>>> listarEstudantesPorCurso(@PathVariable Long id) {
+        try {
+            String sql = "SELECT e.* FROM tb_estudante e " +
+                        "INNER JOIN tb_estudante_curso ec ON e.id = ec.id_estudante " +
+                        "WHERE ec.cod_curso = ?";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, id);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
         }
     }
 }
