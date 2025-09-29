@@ -1,0 +1,21 @@
+.jbdcCabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 50px;
+    gap: 20px;
+}
+
+.selectTable select {
+    width: 300px;
+    border: 1px solid white;
+    background-color: transparent;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.selectTable option {
+    background-color: transparent;
+    color: black;
+}

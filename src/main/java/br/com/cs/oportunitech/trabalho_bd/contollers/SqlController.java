@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
+
 @RestController
 @RequestMapping("/sql")
 @CrossOrigin(origins = "*")
@@ -94,4 +95,53 @@ public class SqlController {
             return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
+
+    @PostMapping("/estudante")
+    public ResponseEntity<String> inserirEstudante(@RequestBody Map<String, Object> body) {
+        try {
+            String sql = "INSERT INTO tb_estudante (primeiro_nome, segundo_nome, email, telefone) VALUES (?, ?, ?, ?)";
+            int rows = jdbcTemplate.update(
+                sql,
+                body.get("primeiroNome"),
+                body.get("segundoNome"),
+                body.get("email"),
+                body.get("telefone")
+            );
+            return ResponseEntity.ok("Estudante inserido com sucesso! Linhas afetadas: " + rows);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao inserir estudante: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/estudantes")
+    public ResponseEntity<List<Map<String, Object>>> listarEstudantes() {
+        try {
+            String sql = "SELECT * FROM tb_estudante";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @PostMapping("/matricular")
+    public ResponseEntity<String> matricular(@RequestBody Map<String, Object> body) {
+        try {
+            String sql = "INSERT INTO tb_estudante_curso (id, cod_curso) VALUES (?, ?)";
+            int rows = jdbcTemplate.update(
+                sql,
+                body.get("idEstudante"),
+                body.get("codCurso")
+            );
+            return ResponseEntity.ok("Matrícula realizada! Linhas afetadas: " + rows);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao matricular: " + e.getMessage());
+        }
+    }
+
+
+
 }
