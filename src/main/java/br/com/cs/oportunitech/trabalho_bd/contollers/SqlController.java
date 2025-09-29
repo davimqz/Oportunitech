@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
-
 @RestController
 @RequestMapping("/sql")
 @CrossOrigin(origins = "*")
@@ -26,10 +24,6 @@ public class SqlController {
     @PostMapping("/execute")
     public ResponseEntity<?> executeSql(@RequestBody Map<String, String> body) {
         String sql = body.get("sql"); 
-
-        System.out.println("=== DEBUG INFO ===");
-        System.out.println("SQL recebido (raw): [" + sql + "]");
-
         try {
             String sqlClean = sql.trim();
             String sqlLower = sqlClean.toLowerCase();
@@ -39,7 +33,6 @@ public class SqlController {
             for (String cmd : queryCommands) {
                 if (sqlLower.startsWith(cmd)) {
                     isQuery = true;
-                    System.out.println("Comando identificado como QUERY: " + cmd);
                     break;
                 }
             }
@@ -67,45 +60,38 @@ public class SqlController {
         }
     }
 
-    
     @GetMapping("/test-connection")
     public ResponseEntity<String> testConnection() {
         try {
-            System.out.println("Testando conexão com queryForObject...");
             Integer result = jdbcTemplate.queryForObject("SELECT 1", Integer.class);
-            System.out.println("Resultado da conexão: " + result);
             return ResponseEntity.ok("Conexão OK! Resultado: " + result);
         } catch (Exception e) {
-            System.out.println("Erro na conexão: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.badRequest().body("Erro de conexão: " + e.getMessage());
         }
     }
-    
+
     @GetMapping("/test-simple")
     public ResponseEntity<String> testSimple() {
         try {
-            System.out.println("Teste simples com queryForList...");
             List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT 1 as numero");
-            System.out.println("Resultado: " + result);
             return ResponseEntity.ok("Teste simples OK: " + result.toString());
         } catch (Exception e) {
-            System.out.println("Erro no teste simples: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
         }
     }
 
+    // ✅ Inserir Estudante com IDADE
     @PostMapping("/estudante")
     public ResponseEntity<String> inserirEstudante(@RequestBody Map<String, Object> body) {
         try {
-            String sql = "INSERT INTO tb_estudante (primeiro_nome, segundo_nome, email, telefone) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO tb_estudante (primeiro_nome, segundo_nome, email, telefone, idade) VALUES (?, ?, ?, ?, ?)";
             int rows = jdbcTemplate.update(
                 sql,
                 body.get("primeiroNome"),
                 body.get("segundoNome"),
                 body.get("email"),
-                body.get("telefone")
+                body.get("telefone"),
+                body.get("idade")
             );
             return ResponseEntity.ok("Estudante inserido com sucesso! Linhas afetadas: " + rows);
         } catch (Exception e) {
@@ -126,10 +112,11 @@ public class SqlController {
         }
     }
 
+    // ✅ Corrigir matrícula para usar id_estudante
     @PostMapping("/matricular")
     public ResponseEntity<String> matricular(@RequestBody Map<String, Object> body) {
         try {
-            String sql = "INSERT INTO tb_estudante_curso (id, cod_curso) VALUES (?, ?)";
+            String sql = "INSERT INTO tb_estudante_curso (id_estudante, cod_curso) VALUES (?, ?)";
             int rows = jdbcTemplate.update(
                 sql,
                 body.get("idEstudante"),
@@ -141,7 +128,4 @@ public class SqlController {
             return ResponseEntity.badRequest().body("Erro ao matricular: " + e.getMessage());
         }
     }
-
-
-
 }
