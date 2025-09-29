@@ -46,6 +46,9 @@
     justify-content: flex-start;
     align-items: flex-start;
     width: 350px;
+}
+
+.graficoIndividualInformations {
     text-align: justify;
 }
 
@@ -57,7 +60,8 @@
 
 .graficoIndividualInformations h1 {
     margin-bottom: 12px;
-    font-size: 28px;
+    font-size: 25px;
+    text-align: left;
 }
 
 .typeGrafico {

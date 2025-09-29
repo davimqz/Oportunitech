@@ -103,13 +103,13 @@ const Grafico = () => {
         <div className="graficoBox" id='dispercao'>
             {/* Pizza */}
             <div className="typeGrafico">
-                <i class="fa-solid fa-chart-pie fa-2x"></i>
-                <h1>Grafico de Pizza</h1>
+                <i class="fa-solid fa-chart-line fa-2x"></i>
+                <h1>Grafico de Disperção</h1>
             </div>
             {graficos.length > 0 ? (
                 graficos.map((grafico) => (
                 <li key={grafico.id}>
-                    {grafico.type == "PIZZA" && (
+                    {grafico.type == "DISPERSAO" && (
                     <div className="graficoIndividual">
                         <div className="graficoIndividualImage">
                             <img src={grafico.image} alt="" />

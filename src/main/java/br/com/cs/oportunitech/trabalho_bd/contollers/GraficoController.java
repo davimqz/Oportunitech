@@ -18,11 +18,9 @@ import br.com.cs.oportunitech.trabalho_bd.entities.Grafico;
 import br.com.cs.oportunitech.trabalho_bd.service.GraficoService;
 
 @RestController
-@CrossOrigin(origins = {
-    "http://localhost:5173",
-})
 @RequestMapping("/api/grafico")
-public class CardController {
+@CrossOrigin(origins = {"http://localhost:5173"}) 
+public class GraficoController {
 
     @Autowired
     private GraficoService graficoService;
@@ -50,7 +48,7 @@ public class CardController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCard(@PathVariable String id) {
+    public ResponseEntity<Void> deleteGraphics(@PathVariable String id) {
         boolean deleted = graficoService.deleteGrafico(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
