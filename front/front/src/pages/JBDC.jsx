@@ -7,6 +7,7 @@ const JBDC = () => {
     const [dados, setDados] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    const API_URL = "https://oportunitech.onrender.com/sql";
 
     const carregarDados = async (nomeTabela) => {
     if (!nomeTabela) return;
