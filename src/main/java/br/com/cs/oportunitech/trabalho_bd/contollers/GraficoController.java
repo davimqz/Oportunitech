@@ -14,12 +14,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import br.com.cs.oportunitech.trabalho_bd.entities.Grafico;
 import br.com.cs.oportunitech.trabalho_bd.service.GraficoService;
 
 @RestController
 @RequestMapping("/api/grafico")
-@CrossOrigin(origins = {"http://localhost:5173"}) 
+@CrossOrigin(origins = {"https://oportunitech.vercel.app/"}) 
 public class GraficoController {
 
     @Autowired
