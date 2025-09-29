@@ -19,3 +19,54 @@
     background-color: transparent;
     color: black;
 }
+
+.results-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.results-table th,
+.results-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.tabelasInsert {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 50px;
+    gap: 20px;
+}
+
+.tabelasInsert input {
+    width: 20%;
+    height: 40px;
+    padding-left: 20px;
+    border-radius: 10px;
+    border: none;
+    background-color: #ddd;
+    color: #3a3a3a;
+}
+
+.buttonInsert {
+    cursor: pointer;
+}
+
+.buttonInsert button {
+    width: 420px;
+    height: 50px;
+    border-radius: 10px;
+    border: none;
+    background-color: rgb(211, 211, 255);
+    color: #3a3a3a;
+    font-weight: bold;
+    transition: 0.3s all ease-in-out;
+}
+
+.buttonInsert button:hover {
+    background-color: #ddd;
+}
