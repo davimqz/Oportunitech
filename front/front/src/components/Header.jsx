@@ -31,6 +31,10 @@ const Header = () => {
                 <a href="/visualizar" className="nav-link">Visualizar</a>
               </div>
               <div className="headerOption">
+                <i class="fa-solid fa-server"></i>
+                <a href="/jbdc" className="nav-link">JBDC</a>
+              </div>
+              <div className="headerOption">
                 <i class="fa-solid fa-info"></i>
                 <a href="/sobre" className="nav-link">Sobre o Projeto</a>
               </div>
