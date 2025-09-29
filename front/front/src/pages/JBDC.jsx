@@ -5,6 +5,7 @@ const JBDC = () => {
   const [tabelaSelecionada, setTabelaSelecionada] = useState("");
   const [dados, setDados] = useState(null);
   const [loading, setLoading] = useState(false);
+  
   const API_URL = "https://oportunitech.onrender.com/sql";
     
   const [novoEstudante, setNovoEstudante] = useState({
@@ -160,6 +161,46 @@ const JBDC = () => {
       </div>
 
       {tabelaSelecionada === "tb_estudante" && (
+        <div className='tabelasInsert'>
+          <h2>Inserir Novo Estudante</h2>
+          <input
+            type="text"
+            placeholder="Primeiro Nome"
+            value={novoEstudante.primeiroNome}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, primeiroNome: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="Segundo Nome"
+            value={novoEstudante.segundoNome}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, segundoNome: e.target.value })}
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={novoEstudante.email}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, email: e.target.value })}
+          />
+          <input
+            type="text"
+            placeholder="Telefone"
+            value={novoEstudante.telefone}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, telefone: e.target.value })}
+          />
+          <input
+            type="number"
+            placeholder="Idade"
+            value={novoEstudante.idade}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, idade: e.target.value })}
+          />
+
+          <div className="buttonInsert">
+            <button onClick={inserirEstudante}>Salvar Estudante</button>
+          </div>
+        </div>
+      )}
+
+      {tabelaSelecionada === "tb_curso" && (
         <div className='tabelasInsert'>
           <h2>Inserir Novo Estudante</h2>
           <input

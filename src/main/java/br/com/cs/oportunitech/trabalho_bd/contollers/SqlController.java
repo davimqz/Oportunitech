@@ -60,27 +60,6 @@ public class SqlController {
         }
     }
 
-    @GetMapping("/test-connection")
-    public ResponseEntity<String> testConnection() {
-        try {
-            Integer result = jdbcTemplate.queryForObject("SELECT 1", Integer.class);
-            return ResponseEntity.ok("Conexão OK! Resultado: " + result);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro de conexão: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/test-simple")
-    public ResponseEntity<String> testSimple() {
-        try {
-            List<Map<String, Object>> result = jdbcTemplate.queryForList("SELECT 1 as numero");
-            return ResponseEntity.ok("Teste simples OK: " + result.toString());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
-        }
-    }
-
-    // ✅ Inserir Estudante com IDADE
     @PostMapping("/estudante")
     public ResponseEntity<String> inserirEstudante(@RequestBody Map<String, Object> body) {
         try {
@@ -112,7 +91,6 @@ public class SqlController {
         }
     }
 
-    // ✅ Corrigir matrícula para usar id_estudante
     @PostMapping("/matricular")
     public ResponseEntity<String> matricular(@RequestBody Map<String, Object> body) {
         try {
