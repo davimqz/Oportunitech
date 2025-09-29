@@ -108,3 +108,28 @@
   background-color: #5e5e5e;
 }
 
+.baixarExelContainer {
+  display: flex;
+  align-items: start;
+  justify-content: right;
+  margin-top: 50px;
+  border: 1px solid white;
+  width: 150px;
+  padding: 15px;
+  margin-left: 100px;
+  transition: 0.3s all ease-in-out;
+  cursor: pointer;
+}
+
+.baixarExelContainer:hover {
+  background-color: white;
+  color: #000;
+  border-radius: 20px;
+}
+
+.exelBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}

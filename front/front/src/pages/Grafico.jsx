@@ -44,6 +44,12 @@ const Grafico = () => {
                 </div>
             </div>
         </div>
+        <div className="baixarExelContainer">
+            <div className="exelBox">
+                <i class="fa-solid fa-download"></i>
+                <p>Baixar Relatorio</p>
+            </div>
+        </div>
         <div className="graficoBox" id='barras'>
             {/* Barras */}
             <div className="typeGrafico">
