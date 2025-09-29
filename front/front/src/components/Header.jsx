@@ -27,12 +27,12 @@ const Header = () => {
                 <a href="/graficos" className="nav-link">Graficos</a>
               </div>
               <div className="headerOption">
-                <i class="fa-solid fa-chart-simple"></i>
-                <a href="/graficos" className="nav-link">Visualizar</a>
+                <i class="fa-solid fa-server"></i>
+                <a href="/visualizar" className="nav-link">Visualizar</a>
               </div>
               <div className="headerOption">
-                <i class="fa-solid fa-chart-simple"></i>
-                <a href="/graficos" className="nav-link">Sobre o Projeto</a>
+                <i class="fa-solid fa-info"></i>
+                <a href="/sobre" className="nav-link">Sobre o Projeto</a>
               </div>
             </nav>
 

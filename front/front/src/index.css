@@ -158,3 +158,35 @@
   margin-top: 100px;
 }
 
+.infoContainer {
+  margin-top: 100px;
+}
+
+.infoBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  width: 900px;
+  margin: 0 auto;
+  font-size: 20px;
+  gap: 20px;
+}
+
+.ferramentasContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;  
+  flex-direction: column;
+  margin-top: 50px;
+}
+
+.ferramentasBox {
+  display: flex;
+  align-items: center;
+}
+
+.ferramentasBox img {
+  width: 150px;
+}
