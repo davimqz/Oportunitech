@@ -5,7 +5,7 @@ const JBDC = () => {
   const [tabelaSelecionada, setTabelaSelecionada] = useState("");
   const [dados, setDados] = useState(null);
   const [loading, setLoading] = useState(false);
-  
+
   const API_URL = "https://oportunitech.onrender.com/sql";
     
   const [novoEstudante, setNovoEstudante] = useState({
@@ -14,6 +14,11 @@ const JBDC = () => {
     email: "",
     telefone: "",
     idade: ""
+  });
+
+  const [novoCurso, setNovoCurso] = useState({
+    nome: "",
+    duracao: ""
   });
 
   useEffect(() => {
@@ -25,7 +30,6 @@ const JBDC = () => {
       })
       .catch(err => console.error("Erro ao buscar tabelas:", err));
   }, []);
-
 
   const carregarDados = async (nomeTabela) => {
     if (!nomeTabela) return;
@@ -80,6 +84,27 @@ const JBDC = () => {
       });
     } catch (err) {
       alert("Erro ao inserir estudante: " + err.message);
+    }
+  };
+
+  const inserirCurso = async () => {
+    try {
+      const response = await fetch(`${API_URL}/curso`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(novoCurso)
+      });
+
+      const result = await response.text();
+      alert(result);
+      carregarDados("tb_curso");
+      
+      setNovoCurso({
+        nome: "",
+        duracao: ""
+      });
+    } catch (err) {
+      alert("Erro ao inserir curso: " + err.message);
     }
   };
 
@@ -160,6 +185,7 @@ const JBDC = () => {
         </div>
       </div>
 
+      {/* Estudante */}
       {tabelaSelecionada === "tb_estudante" && (
         <div className='tabelasInsert'>
           <h2>Inserir Novo Estudante</h2>
@@ -200,42 +226,25 @@ const JBDC = () => {
         </div>
       )}
 
+      {/* Curso */}
       {tabelaSelecionada === "tb_curso" && (
         <div className='tabelasInsert'>
-          <h2>Inserir Novo Estudante</h2>
+          <h2>Inserir Novo Curso</h2>
           <input
             type="text"
-            placeholder="Primeiro Nome"
-            value={novoEstudante.primeiroNome}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, primeiroNome: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Segundo Nome"
-            value={novoEstudante.segundoNome}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, segundoNome: e.target.value })}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={novoEstudante.email}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, email: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Telefone"
-            value={novoEstudante.telefone}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, telefone: e.target.value })}
+            placeholder="Nome do Curso"
+            value={novoCurso.nome}
+            onChange={(e) => setNovoCurso({ ...novoCurso, nome: e.target.value })}
           />
           <input
             type="number"
-            placeholder="Idade"
-            value={novoEstudante.idade}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, idade: e.target.value })}
+            placeholder="Duração (semestres)"
+            value={novoCurso.duracao}
+            onChange={(e) => setNovoCurso({ ...novoCurso, duracao: e.target.value })}
           />
 
           <div className="buttonInsert">
-            <button onClick={inserirEstudante}>Salvar Estudante</button>
+            <button onClick={inserirCurso}>Salvar Curso</button>
           </div>
         </div>
       )}
