@@ -101,11 +101,10 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  color: white;
 }
 
 .boxType:hover {
-  background-color: #eee;
-color: #59335f;
-
+  background-color: #5e5e5e;
 }
 

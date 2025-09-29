@@ -2,6 +2,7 @@ package br.com.cs.oportunitech.trabalho_bd.contollers;
 
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,7 +24,7 @@ public class SqlController {
 
     @PostMapping("/execute")
     public ResponseEntity<?> executeSql(@RequestBody Map<String, String> body) {
-        String sql = body.get("sql"); // pega o campo sql do JSON
+        String sql = body.get("sql"); 
 
         System.out.println("=== DEBUG INFO ===");
         System.out.println("SQL recebido (raw): [" + sql + "]");
