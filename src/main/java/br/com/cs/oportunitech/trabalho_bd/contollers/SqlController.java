@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @RestController
 @RequestMapping("/sql")
 @CrossOrigin(origins = "*")
@@ -22,24 +23,18 @@ public class SqlController {
     private JdbcTemplate jdbcTemplate;
 
     @PostMapping("/execute")
-    public ResponseEntity<?> executeSql(@RequestBody String sql) {
+    public ResponseEntity<?> executeSql(@RequestBody Map<String, String> body) {
+        String sql = body.get("sql"); 
+
         System.out.println("=== DEBUG INFO ===");
         System.out.println("SQL recebido (raw): [" + sql + "]");
-        System.out.println("SQL length: " + sql.length());
-        System.out.println("SQL bytes: " + java.util.Arrays.toString(sql.getBytes()));
-        
+
         try {
             String sqlClean = sql.trim();
             String sqlLower = sqlClean.toLowerCase();
-            
-            System.out.println("SQL limpo: [" + sqlClean + "]");
-            System.out.println("SQL lowercase: [" + sqlLower + "]");
-            System.out.println("Começa com 'select'? " + sqlLower.startsWith("select"));
-            
-            // Lista de comandos que retornam dados
             String[] queryCommands = {"select", "show", "describe", "explain"};
             boolean isQuery = false;
-            
+
             for (String cmd : queryCommands) {
                 if (sqlLower.startsWith(cmd)) {
                     isQuery = true;
@@ -47,24 +42,30 @@ public class SqlController {
                     break;
                 }
             }
-            
+
             if (isQuery) {
-                System.out.println("Executando queryForList...");
                 List<Map<String, Object>> result = jdbcTemplate.queryForList(sqlClean);
-                System.out.println("Resultado: " + result);
                 return ResponseEntity.ok(result);
             } else {
-                System.out.println("Executando update...");
                 int updated = jdbcTemplate.update(sqlClean);
-                System.out.println("Linhas afetadas: " + updated);
                 return ResponseEntity.ok("Operação executada com sucesso. Linhas afetadas: " + updated);
             }
         } catch (Exception e) {
-            System.out.println("ERRO: " + e.getClass().getName() + " - " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Erro ao executar SQL: " + e.getMessage());
         }
     }
+
+    @GetMapping("/tables")
+    public ResponseEntity<List<Map<String, Object>>> listarTabelas() {
+        try {
+            List<Map<String, Object>> tabelas = jdbcTemplate.queryForList("SHOW TABLES");
+            return ResponseEntity.ok(tabelas);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     
     @GetMapping("/test-connection")
     public ResponseEntity<String> testConnection() {

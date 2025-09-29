@@ -19,16 +19,21 @@ const Home = () => {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
-        body: sql.trim() // enviando como string pura
+        body: JSON.stringify({ sql: sql.trim() }) 
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Erro ${response.status}: ${errorText}`);
+      const text = await response.text(); 
+      let data;
+      try {
+        data = JSON.parse(text); 
+      } catch {
+        data = text; 
       }
 
-      // ✅ Corrigido para parsear JSON
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data);
+      }
+
       setResult(data);
     } catch (error) {
       console.error("Erro ao executar SQL:", error);
@@ -37,6 +42,7 @@ const Home = () => {
       setLoading(false);
     }
   }
+
 
   const renderResult = () => {
     if (!result) return null;
@@ -48,6 +54,10 @@ const Home = () => {
           <p>{result.error}</p>
         </div>
       );
+    } else {
+      <div className="success-message">
+        <p>Codigo Funcionando</p>
+      </div>
     }
 
     if (Array.isArray(result) && result.length > 0) {
