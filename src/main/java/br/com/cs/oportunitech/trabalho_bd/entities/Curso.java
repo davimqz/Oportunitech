@@ -3,6 +3,7 @@ package br.com.cs.oportunitech.trabalho_bd.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import br.com.cs.oportunitech.trabalho_bd.entities.Enum.CursoEnum;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +29,8 @@ public class Curso {
 
     private String nome;
     private int duracao;
+
+    private CursoEnum type;
 
     @ManyToMany(mappedBy = "cursos")
     private Set<Estudante> estudantes = new HashSet<>();
