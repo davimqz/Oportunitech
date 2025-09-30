@@ -154,12 +154,6 @@ const JBDC = () => {
         </div>
       );
     }
-
-    return (
-      <div className="json-result">
-        <pre>{JSON.stringify(dados, null, 2)}</pre>
-      </div>
-    );
   };
 
   return (
