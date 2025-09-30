@@ -232,7 +232,7 @@ const JBDC = () => {
           />
           <input
             type="number"
-            placeholder="Duração (semestres)"
+            placeholder="Duração (Horas)"
             value={novoCurso.duracao}
             onChange={(e) => setNovoCurso({ ...novoCurso, duracao: e.target.value })}
           />

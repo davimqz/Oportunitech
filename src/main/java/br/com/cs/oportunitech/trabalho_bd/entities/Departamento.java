@@ -32,11 +32,21 @@ public class Departamento {
     private String nome;
 
     // Relacionamento com supervisor (auto-relacionamento ManyToOne)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "supervisor_id")
     private Departamento supervisor;
 
     // Lista de subordinados (OneToMany auto-relacional)
     @OneToMany(mappedBy = "supervisor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Departamento> subordinados;
+
+    // Relacionamento com o funcionário responsável pelo departamento
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cod_funcionario")
+    private Funcionario funcionario;
+
+    @Override
+    public String toString() {
+        return String.valueOf(cod_dep);
+    }
 }
