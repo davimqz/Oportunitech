@@ -45,12 +45,22 @@ const Grafico = () => {
                 </div>
             </div>
         </div>
-        <div className="baixarExelContainer">
+        <div
+            className="baixarExelContainer"
+            onClick={() => {
+                const link = document.createElement("a");
+                link.href = "https://res.cloudinary.com/dthgw4q5d/raw/upload/OportuniTech_respostas_-_Respostas_ao_formulário_1_tjczze";
+                link.download = "Relatorio.pdf"; 
+                link.target = "_blank"; 
+                link.click();
+            }}
+            >
             <div className="exelBox">
-                <i class="fa-solid fa-download"></i>
-                <p>Baixar Relatorio</p>
+                <i className="fa-solid fa-download"></i>
+                <p>Baixar Relatório</p>
             </div>
-        </div>
+            </div>
+
         <div className="graficoBox" id='barras'>
             {/* Barras */}
             <div className="typeGrafico">
