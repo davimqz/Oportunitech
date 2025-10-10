@@ -5,6 +5,7 @@ import Grafico from './pages/Grafico';
 import Sobre from './pages/Sobre';
 import Visualizar from './components/Visualizar';
 import JBDC from './pages/JBDC';
+import Footer from './components/Footer';
 
 const App = () => {
 
@@ -18,6 +19,7 @@ const App = () => {
         <Route path="/visualizar" element={<Visualizar />} />
         <Route path="/jbdc" element={<JBDC />} />
       </Routes>
+      <Footer />
     </div>
   )
 }

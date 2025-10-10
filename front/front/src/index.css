@@ -2,7 +2,6 @@
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-  color-scheme: light dark;
   background-color: #242424;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -10,7 +9,6 @@
   -moz-osx-font-smoothing: grayscale;
   font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   scroll-behavior: smooth;
-
 }
 
 * {
@@ -38,7 +36,7 @@
   height: 100px;
   border-radius: 20px;
   background-color: white;
-  color: #000;
+  color: #ffffff;
   padding-left: 10px;
   padding-top: 10px;
   margin-top: 20px;
@@ -53,6 +51,7 @@
   background-color: darkcyan;
   font-weight: bolder;
   cursor: pointer;
+  color: white;
 }
 
 .cabecalhoInput {
@@ -60,6 +59,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
+  color: white;
 }
 
 .cabecalhoSql {
@@ -67,52 +67,149 @@
   align-items: center;
   justify-content: center;
   margin-top: 100px;
+  color: white;
 }
 
 .query-results {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 20px;
+  margin: 40px 20px;
   overflow-x: auto;
+  padding: 0 20px;
 }
 
 .results-table {
-  width: 70%;
+  width: 90%;
+  max-width: 1200px;
   border-collapse: collapse;
-  border: 2px solid #ffffff;
-  font-family: Arial, sans-serif;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   font-size: 14px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .results-table thead {
-  background-color: transparent;
+  background: linear-gradient(135deg, #1e7a7a, #2a9d8f);
 }
 
 .results-table th {
-  padding: 12px;
+  padding: 16px 20px;
   text-align: left;
-  font-weight: bold;
-  border-bottom: 2px solid #ffffff;
+  font-weight: 600;
   color: #ffffff;
-  border: 1px solid rgb(255, 255, 255);
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid #167a7a;
+}
+
+.results-table tbody tr {
+  background-color: #2a2a2a;
+  transition: all 0.3s ease;
+}
+
+.results-table tbody tr:nth-child(even) {
+  background-color: #242424;
+}
+
+.results-table tbody tr:hover {
+  background-color: #333333;
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(42, 157, 143, 0.2);
 }
 
 .results-table td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  color: #ffffff;
-  border: 1px solid rgb(255, 255, 255);
+  padding: 14px 20px;
+  color: #e0e0e0;
+  border-bottom: 1px solid #3a3a3a;
+  font-size: 13px;
 }
 
-.results-table tr:hover {
-  transition: background-color 0.2s ease-in-out;
+.results-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
-.results-table td:contains("NULL") {
-  color: #ffffff;
+/* Estilo para células NULL */
+.results-table td:has-text("NULL") {
+  color: #888888;
   font-style: italic;
+  opacity: 0.7;
+}
+
+/* Mensagens de erro e sucesso */
+.error-message {
+  background: linear-gradient(135deg, #d32f2f, #c62828);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  margin: 30px auto;
+  max-width: 600px;
+  box-shadow: 0 6px 20px rgba(211, 47, 47, 0.3);
+}
+
+.error-message h3 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.error-message p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.success-message {
+  background: linear-gradient(135deg, #2a9d8f, #1e7a7a);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  margin: 30px auto;
+  max-width: 600px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(42, 157, 143, 0.3);
+  font-weight: 500;
+  font-size: 16px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .results-table {
+    width: 100%;
+    font-size: 12px;
+  }
+  
+  .results-table th,
+  .results-table td {
+    padding: 10px 12px;
+  }
+  
+  .query-results {
+    margin: 20px 10px;
+    padding: 0 10px;
+  }
+}
+
+/* Scroll customizado para a tabela */
+.query-results::-webkit-scrollbar {
+  height: 8px;
+}
+
+.query-results::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+.query-results::-webkit-scrollbar-thumb {
+  background: #2a9d8f;
+  border-radius: 4px;
+}
+
+.query-results::-webkit-scrollbar-thumb:hover {
+  background: #1e7a7a;
 }
 
 .success-message {
@@ -140,7 +237,7 @@
   flex-direction: column;
   width: 30%;
   background-color: #cf4450;
-  color: #721c24;
+  color: #ffffff;
   padding: 12px 16px;
   border-radius: 8px;
   border: 1px solid #f5c6cb;
@@ -156,6 +253,7 @@
   justify-content: center;
   flex-direction: column;
   margin-top: 100px;
+  color: white;
 }
 
 .infoContainer {
@@ -172,6 +270,7 @@
   margin: 0 auto;
   font-size: 20px;
   gap: 20px;
+  color: white;
 }
 
 .ferramentasContainer {
@@ -179,7 +278,8 @@
   align-items: center;
   justify-content: center;  
   flex-direction: column;
-  margin-top: 50px;
+  margin-top: 100px;
+  color: white;
 }
 
 .ferramentasBox {
@@ -204,6 +304,7 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  color: white;
 }
 
 .selectContainer select {
@@ -217,4 +318,23 @@
 
 .visualizarTabelaContainer {
   margin-top: 100px;
+}
+
+.sqlInput textarea {
+  display: flex;
+  width: 100%;
+  height: 100px;
+  margin-top: 20px;
+  background-color: white;
+  padding: 10px; /* padding em todos os lados */
+  box-shadow: 0px 0px 10px rgb(122, 122, 122);
+  color: #000;
+  font-family: inherit;
+  font-size: inherit;
+  resize: vertical; /* permite redimensionar verticalmente */
+  vertical-align: top; /* alinha o texto no topo */
+}
+
+.sqlInput textarea::placeholder {
+  color: #999;
 }

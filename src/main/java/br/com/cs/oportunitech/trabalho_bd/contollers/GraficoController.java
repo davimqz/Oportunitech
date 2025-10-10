@@ -20,7 +20,7 @@ import br.com.cs.oportunitech.trabalho_bd.service.GraficoService;
 
 @RestController
 @RequestMapping("/api/grafico")
-@CrossOrigin(origins = {"https://oportunitech.vercel.app/"}) 
+@CrossOrigin(origins = {"https://oportunitech.vercel.app/", "http://localhost:5173/"}) 
 public class GraficoController {
 
     @Autowired
