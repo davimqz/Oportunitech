@@ -84,7 +84,9 @@ const Grafico = () => {
                 </li>
                 ))
             ) : (
-            <p>Nenhum grafico encontrado.</p>
+            <div className="error-message">
+                    <p>Nenhum grafico encontrado.</p>
+            </div>
           )}
 
         </div>
@@ -112,7 +114,9 @@ const Grafico = () => {
                 </li>
                 ))
             ) : (
-            <p>Nenhum grafico encontrado.</p>
+                <div className="error-message">
+                    <p>Nenhum grafico encontrado.</p>
+                </div>
           )}
 
         </div>
@@ -140,7 +144,9 @@ const Grafico = () => {
                 </li>
                 ))
             ) : (
-            <p>Nenhum grafico encontrado.</p>
+            <div className="error-message">
+                <p>Nenhum grafico encontrado.</p>
+            </div>
           )}
 
         </div>
