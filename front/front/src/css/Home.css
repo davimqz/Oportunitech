@@ -8,7 +8,7 @@
 }
 
 .boxContainer {
-    width: 500px;
+    width: 600px;
     height: auto;
     border: 1px solid white;
     padding: 20px;
@@ -43,5 +43,9 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.logoText img {
+    width: 150px;
 }
 
