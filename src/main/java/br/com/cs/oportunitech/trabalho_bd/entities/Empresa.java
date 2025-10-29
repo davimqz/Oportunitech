@@ -1,31 +1,28 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import java.util.List;
 
 @Entity
 @Setter
 @Getter
-@Table (name = "tb_empresa")
+@Table(name = "tb_empresa")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Empresa {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cod_empresa;
 
     private String nome;
     private String razaoSocial;
-    private Endereco endereco;
-    
-} 
-    
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cod_endereco") 
+    private Endereco endereco;
+
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
+    private List<Vaga> vagas;
+}

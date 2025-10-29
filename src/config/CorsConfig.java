@@ -15,11 +15,7 @@ public class CorsConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                     .allowedOrigins(
-                        "http://localhost:5173",
-                        "http://localhost:3000",
-                        "http://localhost:8080",
-                        "https://oportunitech.vercel.app",
-                        "https://oportunitech.onrender.com"
+                        "**"
                     )
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                     .allowedHeaders("*")
