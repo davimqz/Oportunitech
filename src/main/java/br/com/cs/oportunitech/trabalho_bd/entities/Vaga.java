@@ -1,5 +1,7 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import br.com.cs.oportunitech.trabalho_bd.entities.Enum.Modalidade;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,9 +31,11 @@ public class Vaga {
     private String descricao;
     private int carga_horaria;
     private Modalidade modalidades;
+    private String salario;
 
     @ManyToOne
     @JoinColumn(name = "cod_empresa")
+    @JsonIgnore
     private Empresa empresa;
 
     private String logoLink;

@@ -3,6 +3,7 @@ package br.com.cs.oportunitech.trabalho_bd.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Setter
@@ -20,9 +21,10 @@ public class Empresa {
     private String razaoSocial;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cod_endereco") 
+    @JoinColumn(name = "cod_endereco")
     private Endereco endereco;
 
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Vaga> vagas;
 }

@@ -1,7 +1,28 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 const Home = () => {
+
+  const [vagas, setVagas] = useState([]);
+  const API_URL = "https://oportunitech-1.onrender.com/api" || "http://localhost:8080/api";
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/vagas`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Erro ao buscar itens.");
+        }
+        return response.json();
+      })
+      .then((data) => setVagas(data))
+      .catch((error) => {
+        console.error(error);
+        alert("Erro ao buscar itens.");
+      });
+  }, []);
+
   return (
+
+    
     <div>
         <h1>Home</h1>
 
