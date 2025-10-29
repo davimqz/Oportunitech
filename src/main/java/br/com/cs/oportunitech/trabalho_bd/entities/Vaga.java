@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +29,11 @@ public class Vaga {
     private String descricao;
     private int carga_horaria;
     private Modalidade modalidades;
+
+    @ManyToOne
+    @JoinColumn(name = "cod_empresa")
+    private Empresa empresa;
+
     private String logoLink;
     
 } 
