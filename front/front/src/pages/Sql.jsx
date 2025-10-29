@@ -13,7 +13,7 @@ const Sql = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("https://oportunitech.onrender.com/sql/execute", {
+      const response = await fetch("http://localhost:8080", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
