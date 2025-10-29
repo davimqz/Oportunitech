@@ -34,6 +34,14 @@ const Header = () => {
                 <i class="fa-solid fa-server"></i>
                 <a href="/jbdc" className="nav-link">JBDC</a>
               </div>
+               <div className="headerOption">
+                <i class="fa-solid fa-server"></i>
+                <a href="/sql" className="nav-link">Sql</a>
+              </div>
+              <div className="headerOption">
+                <i class="fa-solid fa-suitcase"></i>
+                <a href="/vagas" className="nav-link">Vagas</a>
+              </div>
               <div className="headerOption">
                 <i class="fa-solid fa-info"></i>
                 <a href="/sobre" className="nav-link">Sobre o Projeto</a>

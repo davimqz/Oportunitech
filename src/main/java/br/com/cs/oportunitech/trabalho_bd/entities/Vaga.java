@@ -1,7 +1,5 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
-import java.util.UUID;
-
 import br.com.cs.oportunitech.trabalho_bd.entities.Enum.Modalidade;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -29,6 +27,7 @@ public class Vaga {
     private String descricao;
     private int carga_horaria;
     private Modalidade modalidades;
+    private String logoLink;
     
 } 
     
