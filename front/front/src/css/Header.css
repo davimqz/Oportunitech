@@ -48,6 +48,10 @@
     color: white;
   }
 
+  .headerOption i {
+    color: white;
+  }
+
   .headerOption:hover {
     background-color:  rgb(141, 255, 255, 0.1);
     padding: 10px;

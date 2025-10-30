@@ -32,6 +32,7 @@ public class Vaga {
     private int carga_horaria;
     private Modalidade modalidades;
     private String salario;
+    private String nome_empresa;
 
     @ManyToOne
     @JoinColumn(name = "cod_empresa")

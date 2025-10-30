@@ -6,7 +6,7 @@ const JBDC = () => {
   const [dados, setDados] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const API_URL = "https://oportunitech.onrender.com/sql";
+  const API_URL = "https://oportunitech-1.onrender.com/sql";
     
   const [novoEstudante, setNovoEstudante] = useState({
     primeiroNome: "",

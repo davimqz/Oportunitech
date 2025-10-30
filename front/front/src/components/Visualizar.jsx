@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const API_URL = "https://oportunitech.onrender.com/sql";
+const API_URL = "https://oportunitech-1.onrender.com/sql";
 
 const Visualizar = () => {
   const [tabelas, setTabelas] = useState([]);

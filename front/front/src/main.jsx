@@ -3,7 +3,7 @@ import './css/Header.css'
 import './css/Graficos.css'
 import './css/jbdc.css'
 import './css/footer.css'
-import './css/Home.css'
+import './css/Vagas.css'
 import { BrowserRouter } from "react-router-dom";
 import { createRoot } from 'react-dom/client'
 import React from 'react';
