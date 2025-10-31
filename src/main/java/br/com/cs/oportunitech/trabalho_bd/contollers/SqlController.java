@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/sql")
-@CrossOrigin("http://localhost:5173/") 
+@CrossOrigin(origins = "*")
 public class SqlController {
 
     @Autowired
@@ -26,11 +26,11 @@ public class SqlController {
 
     @PostMapping("/execute")
     public ResponseEntity<?> executeSql(@RequestBody Map<String, String> body) {
-        String sql = body.get("sql"); 
+        String sql = body.get("sql");
         try {
             String sqlClean = sql.trim();
             String sqlLower = sqlClean.toLowerCase();
-            String[] queryCommands = {"select", "show", "describe", "explain"};
+            String[] queryCommands = { "select", "show", "describe", "explain" };
             boolean isQuery = false;
 
             for (String cmd : queryCommands) {
@@ -54,11 +54,13 @@ public class SqlController {
     }
 
     @GetMapping("/tables")
-    public ResponseEntity<List<Map<String, Object>>> listarTabelas() {
+    public ResponseEntity<List<String>> listarTabelas() {
         try {
-            List<Map<String, Object>> tabelas = jdbcTemplate.queryForList("SHOW TABLES");
+            String sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'";
+            List<String> tabelas = jdbcTemplate.queryForList(sql, String.class);
             return ResponseEntity.ok(tabelas);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
         }
     }
@@ -68,13 +70,12 @@ public class SqlController {
         try {
             String sql = "INSERT INTO tb_estudante (primeiro_nome, segundo_nome, email, telefone, idade) VALUES (?, ?, ?, ?, ?)";
             int rows = jdbcTemplate.update(
-                sql,
-                body.get("primeiroNome"),
-                body.get("segundoNome"),
-                body.get("email"),
-                body.get("telefone"),
-                body.get("idade")
-            );
+                    sql,
+                    body.get("primeiroNome"),
+                    body.get("segundoNome"),
+                    body.get("email"),
+                    body.get("telefone"),
+                    body.get("idade"));
             return ResponseEntity.ok("Estudante inserido com sucesso! Linhas afetadas: " + rows);
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,10 +100,9 @@ public class SqlController {
         try {
             String sql = "INSERT INTO tb_estudante_curso (id_estudante, cod_curso) VALUES (?, ?)";
             int rows = jdbcTemplate.update(
-                sql,
-                body.get("idEstudante"),
-                body.get("codCurso")
-            );
+                    sql,
+                    body.get("idEstudante"),
+                    body.get("codCurso"));
             return ResponseEntity.ok("Matrícula realizada! Linhas afetadas: " + rows);
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,10 +115,9 @@ public class SqlController {
         try {
             String sql = "INSERT INTO tb_curso (nome, duracao) VALUES (?, ?)";
             int rows = jdbcTemplate.update(
-                sql,
-                body.get("nome"),
-                body.get("duracao")
-            );
+                    sql,
+                    body.get("nome"),
+                    body.get("duracao"));
             return ResponseEntity.ok("Curso inserido com sucesso! Linhas afetadas: " + rows);
         } catch (Exception e) {
             e.printStackTrace();
@@ -155,11 +154,10 @@ public class SqlController {
         try {
             String sql = "UPDATE tb_curso SET nome = ?, duracao = ? WHERE cod_curso = ?";
             int rows = jdbcTemplate.update(
-                sql,
-                body.get("nome"),
-                body.get("duracao"),
-                id
-            );
+                    sql,
+                    body.get("nome"),
+                    body.get("duracao"),
+                    id);
             if (rows > 0) {
                 return ResponseEntity.ok("Curso atualizado com sucesso! Linhas afetadas: " + rows);
             } else {
@@ -191,8 +189,8 @@ public class SqlController {
     public ResponseEntity<List<Map<String, Object>>> listarEstudantesPorCurso(@PathVariable Long id) {
         try {
             String sql = "SELECT e.* FROM tb_estudante e " +
-                        "INNER JOIN tb_estudante_curso ec ON e.id = ec.id_estudante " +
-                        "WHERE ec.cod_curso = ?";
+                    "INNER JOIN tb_estudante_curso ec ON e.id = ec.id_estudante " +
+                    "WHERE ec.cod_curso = ?";
             List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, id);
             return ResponseEntity.ok(result);
         } catch (Exception e) {

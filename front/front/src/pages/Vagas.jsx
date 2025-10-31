@@ -25,37 +25,73 @@ const Vagas = () => {
 
   return (
     <div>
-       <div className="logoEmpresa">
+      <div className="empresaContainer">
+        <div className="logoEmpresa">
           <img
             src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1761774425/AvanadeLogoNoTM_AWColor_RGB_b1kyrp.png"
             alt="Logo empresa"
           />
         </div>
-    
-      <div className="rowVagas">
-        {vagas
-          .filter((vaga) => vaga.nome_empresa === 'Avanade')
-          .map((vaga) => (
-            <div key={vaga.cod_vaga} className="vagaContainer">
-              <div className="boxContainer">
-                <div className="logoText">
-                  <img src={vaga.logo_link} alt={vaga.titulo} />
-                  <h1>{vaga.titulo}</h1>
-                </div>
 
-                <p>{vaga.descricao}</p>
-                <p><strong>Carga horária:</strong> {vaga.carga_horaria}h</p>
-                <p><strong>Salário:</strong> R$ {vaga.salario}</p>
+        <div className="rowVagas">
+          {vagas
+            .filter((vaga) => vaga.nome_empresa === 'Avanade')
+            .map((vaga) => (
+              <div key={vaga.cod_vaga} className="vagaContainer">
+                <div className="boxContainer">
+                  <div className="logoText">
+                    <img src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1761774425/AvanadeLogoNoTM_AWColor_RGB_b1kyrp.png" alt="" />
+                    <h1>{vaga.titulo}</h1>
+                  </div>
 
-                <div className="buttonVaga">
-                  <button>Candidata-se</button>
+                  <p>{vaga.descricao}</p>
+                  <p><strong>Carga horária:</strong> {vaga.carga_horaria}h</p>
+                  <p><strong>Salário:</strong> R$ {vaga.salario}</p>
+
+                  <div className="buttonVaga">
+                    <button>Candidata-se</button>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-          ))}
+
+            ))}
+        </div>
       </div>
+
+
+       <div className="empresaContainer">
+        <div className="logoEmpresa">
+          <img
+            src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1761856576/Accenture.svg_dpomrc.png"
+            alt="Logo empresa"
+          />
+        </div>
+
+        <div className="rowVagas">
+          {vagas
+            .filter((vaga) => vaga.nome_empresa === 'Accenture')
+            .map((vaga) => (
+              <div key={vaga.cod_vaga} className="vagaContainer">
+                <div className="boxContainer">
+                  <div className="logoText">
+                    <img src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1761919827/Accenture.svg_dpomrc_ajlzjt.png" alt="" />
+                    <h1>{vaga.titulo}</h1>
+                  </div>
+
+                  <p>{vaga.descricao}</p>
+                  <p><strong>Carga horária:</strong> {vaga.carga_horaria}h</p>
+                  <p><strong>Salário:</strong> R$ {vaga.salario}</p>
+
+                  <div className="buttonVaga">
+                    <button>Candidata-se</button>
+                  </div>
+                </div>
+              </div>
+
+            ))}
+        </div>
       </div>
+    </div>
   );
 };
 

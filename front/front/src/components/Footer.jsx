@@ -19,6 +19,15 @@ const Footer = () => {
         
         
       </div>
+
+      <div className="ferramentasContainer">
+            <div className="ferramentasBox">
+                    <img src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1761919827/Accenture.svg_dpomrc_ajlzjt.png" alt="" />
+                    <img src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1761774425/AvanadeLogoNoTM_AWColor_RGB_b1kyrp.png" alt="" />
+                    <img src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1759109714/logo3_qcssqr.png" alt="" />
+                    <img src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1759109714/logo1_b5mfdv.png" alt="" />
+            </div>
+        </div>
       
       <div className="footer-bottom">
         <p>&copy; 2025 OportuniTech. Todos os direitos reservados.</p>
