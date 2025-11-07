@@ -59,9 +59,11 @@ public class SqlController {
             String sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'";
             List<String> tabelas = jdbcTemplate.queryForList(sql, String.class);
             return ResponseEntity.ok(tabelas);
-        } catch (Exception e) {
+        }   catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity
+                .badRequest()
+                .body(List.of("Erro ao buscar tabelas: " + e.getMessage()));
         }
     }
 
