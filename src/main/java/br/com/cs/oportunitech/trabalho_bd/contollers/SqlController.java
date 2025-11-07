@@ -59,7 +59,7 @@ public class SqlController {
             String sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'";
             List<String> tabelas = jdbcTemplate.queryForList(sql, String.class);
             return ResponseEntity.ok(tabelas);
-        }   catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity
                 .badRequest()
@@ -67,17 +67,19 @@ public class SqlController {
         }
     }
 
+    // ============= ESTUDANTE =============
     @PostMapping("/estudante")
     public ResponseEntity<String> inserirEstudante(@RequestBody Map<String, Object> body) {
         try {
-            String sql = "INSERT INTO tb_estudante (primeiro_nome, segundo_nome, email, telefone, idade) VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO tb_estudante (email, idade, primeiro_nome, segundo_nome, telefone, cod_curso) VALUES (?, ?, ?, ?, ?, ?)";
             int rows = jdbcTemplate.update(
                     sql,
+                    body.get("email"),
+                    body.get("idade"),
                     body.get("primeiroNome"),
                     body.get("segundoNome"),
-                    body.get("email"),
                     body.get("telefone"),
-                    body.get("idade"));
+                    body.get("codCurso"));
             return ResponseEntity.ok("Estudante inserido com sucesso! Linhas afetadas: " + rows);
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,29 +99,16 @@ public class SqlController {
         }
     }
 
-    @PostMapping("/matricular")
-    public ResponseEntity<String> matricular(@RequestBody Map<String, Object> body) {
-        try {
-            String sql = "INSERT INTO tb_estudante_curso (id_estudante, cod_curso) VALUES (?, ?)";
-            int rows = jdbcTemplate.update(
-                    sql,
-                    body.get("idEstudante"),
-                    body.get("codCurso"));
-            return ResponseEntity.ok("Matrícula realizada! Linhas afetadas: " + rows);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("Erro ao matricular: " + e.getMessage());
-        }
-    }
-
+    // ============= CURSO =============
     @PostMapping("/curso")
     public ResponseEntity<String> inserirCurso(@RequestBody Map<String, Object> body) {
         try {
-            String sql = "INSERT INTO tb_curso (nome, duracao) VALUES (?, ?)";
+            String sql = "INSERT INTO tb_curso (duracao, nome, type) VALUES (?, ?, ?)";
             int rows = jdbcTemplate.update(
                     sql,
+                    body.get("duracao"),
                     body.get("nome"),
-                    body.get("duracao"));
+                    body.get("type"));
             return ResponseEntity.ok("Curso inserido com sucesso! Linhas afetadas: " + rows);
         } catch (Exception e) {
             e.printStackTrace();
@@ -154,11 +143,12 @@ public class SqlController {
     @PutMapping("/curso/{id}")
     public ResponseEntity<String> atualizarCurso(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         try {
-            String sql = "UPDATE tb_curso SET nome = ?, duracao = ? WHERE cod_curso = ?";
+            String sql = "UPDATE tb_curso SET nome = ?, duracao = ?, type = ? WHERE cod_curso = ?";
             int rows = jdbcTemplate.update(
                     sql,
                     body.get("nome"),
                     body.get("duracao"),
+                    body.get("type"),
                     id);
             if (rows > 0) {
                 return ResponseEntity.ok("Curso atualizado com sucesso! Linhas afetadas: " + rows);
@@ -184,6 +174,84 @@ public class SqlController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Erro ao deletar curso: " + e.getMessage());
+        }
+    }
+
+    // ============= EMPRESA =============
+    @PostMapping("/empresa")
+    public ResponseEntity<String> inserirEmpresa(@RequestBody Map<String, Object> body) {
+        try {
+            String sql = "INSERT INTO tb_empresa (nome, razao_social, cod_endereco) VALUES (?, ?, ?)";
+            int rows = jdbcTemplate.update(
+                    sql,
+                    body.get("nome"),
+                    body.get("razaoSocial"),
+                    body.get("codEndereco"));
+            return ResponseEntity.ok("Empresa inserida com sucesso! Linhas afetadas: " + rows);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao inserir empresa: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/empresas")
+    public ResponseEntity<List<Map<String, Object>>> listarEmpresas() {
+        try {
+            String sql = "SELECT * FROM tb_empresa";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    // ============= VAGA =============
+    @PostMapping("/vaga")
+    public ResponseEntity<String> inserirVaga(@RequestBody Map<String, Object> body) {
+        try {
+            String sql = "INSERT INTO tb_vaga (titulo, descricao, carga_horaria, modalidades, salario, cod_empresa, logo_link) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            int rows = jdbcTemplate.update(
+                    sql,
+                    body.get("titulo"),
+                    body.get("descricao"),
+                    body.get("cargaHoraria"),
+                    body.get("modalidades"),
+                    body.get("salario"),
+                    body.get("codEmpresa"),
+                    body.get("logoLink"));
+            return ResponseEntity.ok("Vaga inserida com sucesso! Linhas afetadas: " + rows);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao inserir vaga: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/vagas")
+    public ResponseEntity<List<Map<String, Object>>> listarVagas() {
+        try {
+            String sql = "SELECT * FROM tb_vaga";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    // ============= MATRÍCULA =============
+    @PostMapping("/matricular")
+    public ResponseEntity<String> matricular(@RequestBody Map<String, Object> body) {
+        try {
+            String sql = "INSERT INTO tb_estudante_curso (id_estudante, cod_curso) VALUES (?, ?)";
+            int rows = jdbcTemplate.update(
+                    sql,
+                    body.get("idEstudante"),
+                    body.get("codCurso"));
+            return ResponseEntity.ok("Matrícula realizada! Linhas afetadas: " + rows);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao matricular: " + e.getMessage());
         }
     }
 

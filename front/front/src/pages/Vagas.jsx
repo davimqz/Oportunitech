@@ -62,7 +62,7 @@ const Vagas = () => {
        <div className="empresaContainer">
         <div className="logoEmpresa">
           <img
-            src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1761856576/Accenture.svg_dpomrc.png"
+            src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1761919827/Accenture.svg_dpomrc_ajlzjt.png"
             alt="Logo empresa"
           />
         </div>
