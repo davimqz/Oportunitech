@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const API_URL = "https://oportunitech.onrender.com/sql";
+const API_URL = "http://localhost:8080/sql";
 
 const Visualizar = () => {
   const [tabelas, setTabelas] = useState([]);
@@ -124,9 +124,11 @@ const Visualizar = () => {
             >
               <option value="">Selecione...</option>
               {tabelas.map((t, i) => {
-                const nomeTabela = Object.values(t)[0];
+                const nomeTabela = typeof t === "string" ? t : Object.values(t)[0];
                 return <option key={i} value={nomeTabela}>{nomeTabela}</option>;
               })}
+
+
             </select>
           </div>
 

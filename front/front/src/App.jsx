@@ -7,6 +7,7 @@ import Visualizar from './components/Visualizar';
 import JBDC from './pages/JBDC';
 import Footer from './components/Footer';
 import Sql from './pages/Sql';
+import Vagas from './pages/Vagas';
 
 const App = () => {
 
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/sobre" element={<Sobre />} />
         <Route path="/visualizar" element={<Visualizar />} />
         <Route path="/jbdc" element={<JBDC />} />
+        <Route path="/vagas" element={<Vagas />} />
       </Routes>
       <Footer />
     </div>

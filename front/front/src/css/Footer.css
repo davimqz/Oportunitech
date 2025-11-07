@@ -1,5 +1,5 @@
-.footer {
-          background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+        .footer {
+          background: linear-gradient(105deg, #0d0d0d, #237c7c);
           color: #e0e0e0;
           margin-top: 60px;
           padding: 40px 20px 20px;
@@ -16,7 +16,7 @@
         }
 
         .footer-section h3 {
-          color: #2a9d8f;
+          color: #ffffff;
           margin-bottom: 15px;
           font-size: 24px;
           font-weight: 600;
@@ -30,7 +30,7 @@
         }
 
         .footer-section p {
-          color: #b0b0b0;
+          color: #ffffff;
           line-height: 1.6;
           font-size: 14px;
         }
@@ -46,7 +46,7 @@
         }
 
         .footer-section ul li a {
-          color: #b0b0b0;
+          color: #ffffff;
           text-decoration: none;
           font-size: 14px;
           transition: color 0.3s ease;
@@ -60,12 +60,13 @@
           max-width: 1200px;
           margin: 0 auto;
           padding-top: 20px;
-          border-top: 1px solid #3a3a3a;
+          border-top: 1px solid #ffffff;
           text-align: center;
+          margin-top: 50px;
         }
 
         .footer-bottom p {
-          color: #888888;
+          color: #ffffff;
           font-size: 14px;
           margin: 0;
         }

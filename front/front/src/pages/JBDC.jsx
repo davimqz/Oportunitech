@@ -6,7 +6,7 @@ const JBDC = () => {
   const [dados, setDados] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const API_URL = "https://oportunitech.onrender.com/sql";
+  const API_URL = "https://oportunitech-1.onrender.com/sql";
     
   const [novoEstudante, setNovoEstudante] = useState({
     primeiroNome: "",
@@ -23,7 +23,13 @@ const JBDC = () => {
 
   useEffect(() => {
     fetch(`${API_URL}/tables`)
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || `Erro HTTP ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
         console.log("Tabelas:", data);
         setTabelas(data);

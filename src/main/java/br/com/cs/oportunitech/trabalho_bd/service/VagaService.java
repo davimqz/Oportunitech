@@ -35,7 +35,7 @@ public class VagaService {
             vaga.setModalidades(updatedVaga.getModalidades());
             vaga.setLogoLink(updatedVaga.getLogoLink());
             vaga.setSalario(updatedVaga.getSalario());
-
+            vaga.setNome_empresa(updatedVaga.getNome_empresa());
 
             return vagasRepository.save(vaga);
         });

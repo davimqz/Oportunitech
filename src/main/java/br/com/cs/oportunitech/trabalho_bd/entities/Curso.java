@@ -5,10 +5,12 @@ import java.util.Set;
 
 import br.com.cs.oportunitech.trabalho_bd.entities.Enum.CursoEnum;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,10 +32,12 @@ public class Curso {
     private String nome;
     private int duracao;
 
+    @Enumerated(EnumType.ORDINAL)
     private CursoEnum type;
 
-    @ManyToMany(mappedBy = "cursos")
+    @OneToMany(mappedBy = "curso")
     private Set<Estudante> estudantes = new HashSet<>();
+
 } 
     
 
