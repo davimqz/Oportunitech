@@ -2,7 +2,11 @@ package br.com.cs.oportunitech.trabalho_bd.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -27,4 +31,9 @@ public class Empresa {
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Vaga> vagas;
+
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Set<Funcionario> funcionarios = new HashSet<>();
+
 }

@@ -47,7 +47,6 @@ const Vagas = () => {
                   <p>{vaga.descricao}</p>
                   <p><strong>Carga horária:</strong> {vaga.carga_horaria}h</p>
                   <p><strong>Salário:</strong> R$ {vaga.salario}</p>
-
                   <div className="buttonVaga">
                     <button>Candidata-se</button>
                   </div>

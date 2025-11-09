@@ -1,11 +1,11 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
-import java.util.UUID;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +27,10 @@ public class Funcionario {
     private String primeiroNome;
     private String segundoNome;
     private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "cod_empresa")
+    private Empresa empresa;
     
 } 
     
