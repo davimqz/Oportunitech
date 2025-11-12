@@ -1,7 +1,11 @@
 package br.com.cs.oportunitech.trabalho_bd.contollers;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +31,15 @@ public class SqlController {
     @PostMapping("/execute")
     public ResponseEntity<?> executeSql(@RequestBody Map<String, String> body) {
         String sql = body.get("sql");
+        if (sql == null || sql.isBlank()) {
+            return ResponseEntity.badRequest().body("❌ Nenhum SQL informado.");
+        }
+
         try {
             String sqlClean = sql.trim();
             String sqlLower = sqlClean.toLowerCase();
+
+            // Comandos que são consultas
             String[] queryCommands = { "select", "show", "describe", "explain" };
             boolean isQuery = false;
 
@@ -40,34 +50,131 @@ public class SqlController {
                 }
             }
 
-            if (isQuery) {
+            if (sqlLower.startsWith("create function") ||
+                sqlLower.startsWith("create procedure") ||
+                sqlLower.startsWith("create trigger")) {
+
+                // Processar o SQL removendo delimiters se existirem
+                String processedSql = preprocessStoredRoutine(sqlClean);
+                
+                try (Connection conn = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection()) {
+                    // Habilitar múltiplos statements na URL de conexão
+                    // Mas como workaround, vamos executar statement por statement
+                    
+                    // Dividir por linhas e executar como bloco único
+                    try (Statement stmt = conn.createStatement()) {
+                        stmt.execute(processedSql);
+                    }
+                }
+
+                return ResponseEntity.ok("✅ Estrutura criada com sucesso!");
+
+            } else if (sqlLower.contains("delimiter")) {
+                // Processar múltiplos comandos com DELIMITER
+                return executeWithDelimiter(sqlClean);
+                
+            } else if (isQuery) {
                 List<Map<String, Object>> result = jdbcTemplate.queryForList(sqlClean);
                 return ResponseEntity.ok(result);
+
             } else {
                 int updated = jdbcTemplate.update(sqlClean);
-                return ResponseEntity.ok("Operação executada com sucesso. Linhas afetadas: " + updated);
+                return ResponseEntity.ok("✅ Operação executada com sucesso. Linhas afetadas: " + updated);
             }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("❌ Erro SQL: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Erro ao executar SQL: " + e.getMessage());
+            return ResponseEntity.badRequest().body("❌ Erro ao executar: " + e.getMessage());
         }
     }
 
+    /**
+     * Preprocessa stored procedures/functions removendo problemas de sintaxe
+     */
+    private String preprocessStoredRoutine(String sql) {
+        String processed = sql;
+        
+        // Remover comandos DELIMITER se existirem
+        processed = processed.replaceAll("(?i)DELIMITER\\s+\\S+\\s*", "");
+        
+        // Remover delimitadores customizados no final ($$, //, etc)
+        processed = processed.replaceAll("\\$\\$\\s*$", "");
+        processed = processed.replaceAll("//\\s*$", "");
+        
+        // Garantir que termina sem ponto e vírgula extra
+        processed = processed.trim();
+        if (!processed.endsWith("END")) {
+            // Se não termina com END, pode ter ; sobrando
+            processed = processed.replaceAll(";\\s*$", "");
+        }
+        
+        return processed;
+    }
+
+    /**
+     * Executa SQL que contém comandos DELIMITER
+     */
+    private ResponseEntity<?> executeWithDelimiter(String sql) throws SQLException {
+        // Extrair o delimitador customizado
+        String delimiter = "$$";
+        String[] lines = sql.split("\n");
+        
+        for (String line : lines) {
+            if (line.trim().toLowerCase().startsWith("delimiter")) {
+                String[] parts = line.trim().split("\\s+");
+                if (parts.length > 1) {
+                    delimiter = parts[1];
+                    break;
+                }
+            }
+        }
+        
+        // Remover linhas de DELIMITER
+        StringBuilder cleanSql = new StringBuilder();
+        for (String line : lines) {
+            if (!line.trim().toLowerCase().startsWith("delimiter")) {
+                cleanSql.append(line).append("\n");
+            }
+        }
+        
+        // Dividir pelos delimitadores customizados
+        String[] statements = cleanSql.toString().split(java.util.regex.Pattern.quote(delimiter));
+        
+        try (Connection conn = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection()) {
+            for (String statement : statements) {
+                String trimmed = statement.trim();
+                if (!trimmed.isEmpty() && !trimmed.equals(";")) {
+                    // Remover ; final se houver
+                    trimmed = trimmed.replaceAll(";\\s*$", "");
+                    
+                    try (Statement stmt = conn.createStatement()) {
+                        stmt.execute(trimmed);
+                    }
+                }
+            }
+        }
+        
+        return ResponseEntity.ok("✅ Comandos executados com sucesso!");
+    }
+
+    // ===================== LISTAR TABELAS =====================
     @GetMapping("/tables")
     public ResponseEntity<List<String>> listarTabelas() {
         try {
-            String sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'";
+            String sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()";
             List<String> tabelas = jdbcTemplate.queryForList(sql, String.class);
             return ResponseEntity.ok(tabelas);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity
-                .badRequest()
-                .body(List.of("Erro ao buscar tabelas: " + e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .body(List.of("Erro ao buscar tabelas: " + e.getMessage()));
         }
     }
 
-    // ============= ESTUDANTE =============
+    // ===================== ESTUDANTE =====================
     @PostMapping("/estudante")
     public ResponseEntity<String> inserirEstudante(@RequestBody Map<String, Object> body) {
         try {
@@ -99,7 +206,6 @@ public class SqlController {
         }
     }
 
-    // ============= CURSO =============
     @PostMapping("/curso")
     public ResponseEntity<String> inserirCurso(@RequestBody Map<String, Object> body) {
         try {
@@ -177,7 +283,6 @@ public class SqlController {
         }
     }
 
-    // ============= EMPRESA =============
     @PostMapping("/empresa")
     public ResponseEntity<String> inserirEmpresa(@RequestBody Map<String, Object> body) {
         try {
@@ -206,7 +311,7 @@ public class SqlController {
         }
     }
 
-    // ============= VAGA =============
+    // ===================== VAGA =====================
     @PostMapping("/vaga")
     public ResponseEntity<String> inserirVaga(@RequestBody Map<String, Object> body) {
         try {
@@ -239,7 +344,6 @@ public class SqlController {
         }
     }
 
-    // ============= MATRÍCULA =============
     @PostMapping("/matricular")
     public ResponseEntity<String> matricular(@RequestBody Map<String, Object> body) {
         try {
@@ -268,4 +372,31 @@ public class SqlController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    @GetMapping("/vagas/empresa/{nomeEmpresa}")
+    public ResponseEntity<List<Map<String, Object>>> listarVagasPorEmpresa(@PathVariable String nomeEmpresa) {
+        try {
+            String sql = "SELECT v.* FROM tb_vaga v " +
+                    "INNER JOIN tb_empresa e ON v.cod_empresa = e.cod_empresa " +
+                    "WHERE e.nome LIKE ?";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql, "%" + nomeEmpresa + "%");
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/vagas/ordenar-salario")
+    public ResponseEntity<List<Map<String, Object>>> listarVagasOrdenadasPorSalario() {
+        try {
+            String sql = "SELECT * FROM tb_vaga ORDER BY CAST(REPLACE(REPLACE(salario, 'R$', ''), ',', '.') AS DECIMAL(10,2)) DESC";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 }
