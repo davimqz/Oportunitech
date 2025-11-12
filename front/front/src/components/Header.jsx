@@ -24,7 +24,7 @@ const Header = () => {
               </div>
               <div className="headerOption">
                 <i class="fa-solid fa-chart-simple"></i>
-                <a href="/graficos" className="nav-link">Graficos</a>
+                <a href="/dashboard" className="nav-link">Dashboard</a>
               </div>
               <div className="headerOption">
                 <i class="fa-solid fa-server"></i>

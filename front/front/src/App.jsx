@@ -8,6 +8,7 @@ import JBDC from './pages/JBDC';
 import Footer from './components/Footer';
 import Sql from './pages/Sql';
 import Vagas from './pages/Vagas';
+import Dashboard from './pages/Grafico';
 
 const App = () => {
 
@@ -17,7 +18,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/sql" element={<Sql />} />
-        <Route path="/graficos" element={<Grafico />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/sobre" element={<Sobre />} />
         <Route path="/visualizar" element={<Visualizar />} />
         <Route path="/jbdc" element={<JBDC />} />

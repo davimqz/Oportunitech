@@ -1,141 +1,236 @@
-.cabecalhoGrafico {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 100px;
-    color: white;
+/* Dashboard Container */
+.dashboard-container {
+  padding: 20px;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
-.graficoIndividual {
-    display: flex;
-    align-items: center;   
-    justify-content: center;
-    margin-top: 50px;
-    gap: 50px;
-    min-height: 420px;         
-    box-sizing: border-box;
-    color: white;
+.dashboard-content {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.graficoIndividualImage {
-    width: 800px;              
-    height: 400px;            
-    flex: 0 0 800px;           
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;         
-    border-radius: 6px;
-    overflow: hidden;
+/* Header */
+.dashboard-header {
+  margin-bottom: 30px;
 }
 
-.graficoIndividualImage img {
-    display: block;           
-    width: 100%;
-    height: 100%;
-    object-fit: contain;     
-    transition: 0.4s all ease-in-out;
+.dashboard-title {
+  font-size: 32px;
+  font-weight: bold;
+  color: #1e293b;
+  margin-bottom: 10px;
 }
 
-.graficoIndividualImage img:hover {
-    box-shadow: 0px 0px 5px white;
-    transform: scale(1.05);
+.dashboard-subtitle {
+  color: #64748b;
+  font-size: 16px;
 }
 
-.graficoIndividualInformations {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    width: 350px;
+/* Filtros */
+.filtros-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.graficoIndividualInformations {
-    text-align: justify;
-}
-
-.graficoIndividualInformations h1,
-.graficoIndividualInformations p {
-    margin: 0;  
-    padding: 0;
-}
-
-.graficoIndividualInformations h1 {
-    margin-bottom: 12px;
-    font-size: 25px;
-    text-align: left;
-}
-
-.typeGrafico {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: 50px;
-    gap: 20px;
-    color: white;
-}
-
-.graficosTypes {
+.filtros-toggle {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  color: #3b82f6;
+  padding: 0;
+}
+
+.filtros-toggle:hover {
+  color: #2563eb;
+}
+
+.filtros-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.filtro-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.filtro-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.filtro-select {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  font-size: 14px;
+  color: #1e293b;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filtro-select:hover {
+  border-color: #cbd5e1;
+}
+
+.filtro-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Indicadores */
+.indicadores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.indicador-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.indicador-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.indicador-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.indicador-titulo {
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.indicador-valor {
+  font-size: 28px;
+  font-weight: bold;
+  color: #1e293b;
+  margin: 0;
+}
+
+.indicador-info {
+  font-size: 12px;
+  color: #10b981;
+  margin-top: 5px;
+  margin-bottom: 0;
+}
+
+/* Gráficos */
+.graficos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
   gap: 20px;
 }
 
-.cabecalhoGrafico {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  color: white;
-}
-
-.boxType {
-  gap: 10px;
-  margin-top: 40px;
-  border: 1px solid rgb(0, 0, 0);
-  padding: 10px;
-  border-radius: 5px;
-  transition: 0.3s all ease-in-out;
-  cursor: pointer;
-}
-
-.boxType:hover {
-  border-radius: 15px;
-  transform: scale(1.1);
-}
-
-.boxType a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-
-.baixarExelContainer {
-  display: flex;
-  align-items: start;
-  justify-content: right;
-  margin-top: 50px;
-  border: 1px solid rgb(0, 0, 0);
-  width: 150px;
-  padding: 15px;
-  margin-left: 100px;
-  transition: 0.3s all ease-in-out;
-  cursor: pointer;
-  color: white;
-}
-
-.baixarExelContainer:hover {
+.grafico-card {
   background-color: white;
-  color: black;
-  border-radius: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
 }
 
-.exelBox {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+.grafico-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.grafico-card-full {
+  grid-column: 1 / -1;
+}
+
+.grafico-titulo {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  margin-top: 0;
+  color: #1e293b;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+  .graficos-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 15px;
+  }
+
+  .dashboard-title {
+    font-size: 24px;
+  }
+
+  .dashboard-subtitle {
+    font-size: 14px;
+  }
+
+  .indicadores-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+  }
+
+  .indicador-card {
+    padding: 15px;
+  }
+
+  .indicador-valor {
+    font-size: 24px;
+  }
+
+  .grafico-card {
+    padding: 15px;
+  }
+
+  .grafico-titulo {
+    font-size: 16px;
+  }
+
+  .filtros-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-title {
+    font-size: 20px;
+  }
+
+  .indicadores-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .indicador-valor {
+    font-size: 20px;
+  }
 }
