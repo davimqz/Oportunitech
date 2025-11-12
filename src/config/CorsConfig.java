@@ -14,14 +14,10 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    .allowedOrigins(
-                    "http://localhost:5173",
-                    "http://localhost:3000",
-                    "http://localhost:8080",
-                    "https://oportunitech-1.onrender.com"
-                )
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                    .allowedOriginPatterns("*") // Permite todos os origens durante desenvolvimento
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD")
                     .allowedHeaders("*")
+                    .exposedHeaders("*")
                     .allowCredentials(true)
                     .maxAge(3600);
             }
