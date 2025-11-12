@@ -164,7 +164,15 @@ public class SqlController {
     @GetMapping("/tables")
     public ResponseEntity<List<String>> listarTabelas() {
         try {
-            String sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()";
+            String sql;
+            String dbProductName = jdbcTemplate.getDataSource().getConnection().getMetaData().getDatabaseProductName();
+
+            if (dbProductName.toLowerCase().contains("postgresql")) {
+                sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'";
+            } else {
+                sql = "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()";
+            }
+
             List<String> tabelas = jdbcTemplate.queryForList(sql, String.class);
             return ResponseEntity.ok(tabelas);
         } catch (Exception e) {
@@ -398,5 +406,23 @@ public class SqlController {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
+    @PostMapping("/funcionario")
+    public ResponseEntity<String> inserirFuncionario(@RequestBody Map<String, Object> body) {
+        try {
+            String sql = "INSERT INTO tb_funcionario (primeiro_nome, segundo_nome, email, cod_empresa) VALUES (?, ?, ?, ?)";
+            int rows = jdbcTemplate.update(
+                    sql,
+                    body.get("primeiroNome"),
+                    body.get("segundoNome"),
+                    body.get("email"),
+                    body.get("codEmpresa"));
+            return ResponseEntity.ok("Funcionário inserido com sucesso! Linhas afetadas: " + rows);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao inserir funcionário: " + e.getMessage());
+        }
+    }
+
 
 }

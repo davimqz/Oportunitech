@@ -9,7 +9,7 @@ const JBDC = () => {
   const [empresas, setEmpresas] = useState([]);
 
   const API_URL = "https://oportunitech-1.onrender.com/sql";
-    
+
   const [novoEstudante, setNovoEstudante] = useState({
     primeiroNome: "",
     segundoNome: "",
@@ -41,6 +41,37 @@ const JBDC = () => {
     logoLink: ""
   });
 
+  const [novoFuncionario, setNovoFuncionario] = useState({
+    primeiroNome: "",
+    segundoNome: "",
+    email: "",
+    codEmpresa: ""
+  });
+
+  // Inserir Funcionário
+  const inserirFuncionario = async () => {
+    try {
+      const response = await fetch(`${API_URL}/funcionario`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(novoFuncionario)
+      });
+
+      const result = await response.text();
+      alert(result);
+      carregarDados("tb_funcionario");
+
+      setNovoFuncionario({
+        primeiroNome: "",
+        segundoNome: "",
+        email: "",
+        codEmpresa: ""
+      });
+    } catch (err) {
+      alert("Erro ao inserir funcionário: " + err.message);
+    }
+  };
+
   useEffect(() => {
     fetch(`${API_URL}/tables`)
       .then(async res => {
@@ -56,7 +87,6 @@ const JBDC = () => {
       })
       .catch(err => console.error("Erro ao buscar tabelas:", err));
 
-    // Carregar cursos para o select
     carregarCursos();
     carregarEmpresas();
   }, []);
@@ -124,7 +154,7 @@ const JBDC = () => {
       const result = await response.text();
       alert(result);
       carregarDados("tb_estudante");
-      
+
       setNovoEstudante({
         primeiroNome: "",
         segundoNome: "",
@@ -150,7 +180,7 @@ const JBDC = () => {
       alert(result);
       carregarDados("tb_curso");
       carregarCursos();
-      
+
       setNovoCurso({
         nome: "",
         duracao: "",
@@ -173,7 +203,7 @@ const JBDC = () => {
       alert(result);
       carregarDados("tb_empresa");
       carregarEmpresas();
-      
+
       setNovaEmpresa({
         nome: "",
         razaoSocial: "",
@@ -195,7 +225,7 @@ const JBDC = () => {
       const result = await response.text();
       alert(result);
       carregarDados("tb_vaga");
-      
+
       setNovaVaga({
         titulo: "",
         descricao: "",
@@ -280,7 +310,6 @@ const JBDC = () => {
               } else if (typeof t === 'object' && t !== null) {
                 nomeTabela = t.TABLE_NAME || t.table_name || t.name || Object.values(t)[0];
               }
-              
               return <option key={i} value={nomeTabela}>{nomeTabela}</option>;
             })}
           </select>
@@ -291,40 +320,18 @@ const JBDC = () => {
       {tabelaSelecionada === "tb_estudante" && (
         <div className='tabelasInsert'>
           <h2>Inserir Novo Estudante</h2>
-          <input
-            type="email"
-            placeholder="Email"
-            value={novoEstudante.email}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, email: e.target.value })}
-          />
-          <input
-            type="number"
-            placeholder="Idade"
-            value={novoEstudante.idade}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, idade: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Primeiro Nome"
-            value={novoEstudante.primeiroNome}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, primeiroNome: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Segundo Nome"
-            value={novoEstudante.segundoNome}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, segundoNome: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Telefone"
-            value={novoEstudante.telefone}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, telefone: e.target.value })}
-          />
-          <select
-            value={novoEstudante.codCurso}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, codCurso: e.target.value })}
-          >
+          <input type="email" placeholder="Email" value={novoEstudante.email}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, email: e.target.value })} />
+          <input type="number" placeholder="Idade" value={novoEstudante.idade}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, idade: e.target.value })} />
+          <input type="text" placeholder="Primeiro Nome" value={novoEstudante.primeiroNome}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, primeiroNome: e.target.value })} />
+          <input type="text" placeholder="Segundo Nome" value={novoEstudante.segundoNome}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, segundoNome: e.target.value })} />
+          <input type="text" placeholder="Telefone" value={novoEstudante.telefone}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, telefone: e.target.value })} />
+          <select value={novoEstudante.codCurso}
+            onChange={(e) => setNovoEstudante({ ...novoEstudante, codCurso: e.target.value })}>
             <option value="">Selecione um Curso</option>
             {cursos.map((curso) => (
               <option key={curso.cod_curso} value={curso.cod_curso}>
@@ -332,7 +339,6 @@ const JBDC = () => {
               </option>
             ))}
           </select>
-
           <div className="buttonInsert">
             <button onClick={inserirEstudante}>Salvar Estudante</button>
           </div>
@@ -343,27 +349,16 @@ const JBDC = () => {
       {tabelaSelecionada === "tb_curso" && (
         <div className='tabelasInsert'>
           <h2>Inserir Novo Curso</h2>
-          <input
-            type="number"
-            placeholder="Duração (Horas)"
-            value={novoCurso.duracao}
-            onChange={(e) => setNovoCurso({ ...novoCurso, duracao: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Nome do Curso"
-            value={novoCurso.nome}
-            onChange={(e) => setNovoCurso({ ...novoCurso, nome: e.target.value })}
-          />
-          <select
-            value={novoCurso.type}
-            onChange={(e) => setNovoCurso({ ...novoCurso, type: e.target.value })}
-          >
+          <input type="number" placeholder="Duração (Horas)" value={novoCurso.duracao}
+            onChange={(e) => setNovoCurso({ ...novoCurso, duracao: e.target.value })} />
+          <input type="text" placeholder="Nome do Curso" value={novoCurso.nome}
+            onChange={(e) => setNovoCurso({ ...novoCurso, nome: e.target.value })} />
+          <select value={novoCurso.type}
+            onChange={(e) => setNovoCurso({ ...novoCurso, type: e.target.value })}>
             <option value="0">Graduação</option>
             <option value="1">Pós-Graduação</option>
             <option value="2">Técnico</option>
           </select>
-
           <div className="buttonInsert">
             <button onClick={inserirCurso}>Salvar Curso</button>
           </div>
@@ -374,25 +369,12 @@ const JBDC = () => {
       {tabelaSelecionada === "tb_empresa" && (
         <div className='tabelasInsert'>
           <h2>Inserir Nova Empresa</h2>
-          <input
-            type="text"
-            placeholder="Nome"
-            value={novaEmpresa.nome}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, nome: e.target.value })}
-          />
-          <input
-            type="text"
-            placeholder="Razão Social"
-            value={novaEmpresa.razaoSocial}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, razaoSocial: e.target.value })}
-          />
-          <input
-            type="number"
-            placeholder="Código do Endereço"
-            value={novaEmpresa.codEndereco}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, codEndereco: e.target.value })}
-          />
-
+          <input type="text" placeholder="Nome" value={novaEmpresa.nome}
+            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, nome: e.target.value })} />
+          <input type="text" placeholder="Razão Social" value={novaEmpresa.razaoSocial}
+            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, razaoSocial: e.target.value })} />
+          <input type="number" placeholder="Código do Endereço" value={novaEmpresa.codEndereco}
+            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, codEndereco: e.target.value })} />
           <div className="buttonInsert">
             <button onClick={inserirEmpresa}>Salvar Empresa</button>
           </div>
@@ -403,43 +385,22 @@ const JBDC = () => {
       {tabelaSelecionada === "tb_vaga" && (
         <div className='tabelasInsert'>
           <h2>Inserir Nova Vaga</h2>
-          <input
-            type="text"
-            placeholder="Título"
-            value={novaVaga.titulo}
-            onChange={(e) => setNovaVaga({ ...novaVaga, titulo: e.target.value })}
-          />
-          <textarea
-            placeholder="Descrição"
-            value={novaVaga.descricao}
-            onChange={(e) => setNovaVaga({ ...novaVaga, descricao: e.target.value })}
-            rows="3"
-          />
-          <input
-            type="number"
-            placeholder="Carga Horária"
-            value={novaVaga.cargaHoraria}
-            onChange={(e) => setNovaVaga({ ...novaVaga, cargaHoraria: e.target.value })}
-          />
-          <select
-            value={novaVaga.modalidades}
-            onChange={(e) => setNovaVaga({ ...novaVaga, modalidades: e.target.value })}
-          >
+          <input type="text" placeholder="Título" value={novaVaga.titulo}
+            onChange={(e) => setNovaVaga({ ...novaVaga, titulo: e.target.value })} />
+          <textarea placeholder="Descrição" value={novaVaga.descricao}
+            onChange={(e) => setNovaVaga({ ...novaVaga, descricao: e.target.value })} rows="3" />
+          <input type="number" placeholder="Carga Horária" value={novaVaga.cargaHoraria}
+            onChange={(e) => setNovaVaga({ ...novaVaga, cargaHoraria: e.target.value })} />
+          <select value={novaVaga.modalidades}
+            onChange={(e) => setNovaVaga({ ...novaVaga, modalidades: e.target.value })}>
             <option value="0">Presencial</option>
             <option value="1">Remoto</option>
             <option value="2">Híbrido</option>
           </select>
-          <input
-            type="number"
-            step="0.01"
-            placeholder="Salário"
-            value={novaVaga.salario}
-            onChange={(e) => setNovaVaga({ ...novaVaga, salario: e.target.value })}
-          />
-          <select
-            value={novaVaga.codEmpresa}
-            onChange={(e) => setNovaVaga({ ...novaVaga, codEmpresa: e.target.value })}
-          >
+          <input type="number" step="0.01" placeholder="Salário" value={novaVaga.salario}
+            onChange={(e) => setNovaVaga({ ...novaVaga, salario: e.target.value })} />
+          <select value={novaVaga.codEmpresa}
+            onChange={(e) => setNovaVaga({ ...novaVaga, codEmpresa: e.target.value })}>
             <option value="">Selecione uma Empresa</option>
             {empresas.map((empresa) => (
               <option key={empresa.cod_empresa} value={empresa.cod_empresa}>
@@ -447,15 +408,35 @@ const JBDC = () => {
               </option>
             ))}
           </select>
-          <input
-            type="text"
-            placeholder="Link do Logo (URL)"
-            value={novaVaga.logoLink}
-            onChange={(e) => setNovaVaga({ ...novaVaga, logoLink: e.target.value })}
-          />
-
+          <input type="text" placeholder="Link do Logo (URL)" value={novaVaga.logoLink}
+            onChange={(e) => setNovaVaga({ ...novaVaga, logoLink: e.target.value })} />
           <div className="buttonInsert">
             <button onClick={inserirVaga}>Salvar Vaga</button>
+          </div>
+        </div>
+      )}
+
+      {/* Funcionário */}
+      {tabelaSelecionada === "tb_funcionario" && (
+        <div className='tabelasInsert'>
+          <h2>Inserir Novo Funcionário</h2>
+          <input type="text" placeholder="Primeiro Nome" value={novoFuncionario.primeiroNome}
+            onChange={(e) => setNovoFuncionario({ ...novoFuncionario, primeiroNome: e.target.value })} />
+          <input type="text" placeholder="Segundo Nome" value={novoFuncionario.segundoNome}
+            onChange={(e) => setNovoFuncionario({ ...novoFuncionario, segundoNome: e.target.value })} />
+          <input type="email" placeholder="Email" value={novoFuncionario.email}
+            onChange={(e) => setNovoFuncionario({ ...novoFuncionario, email: e.target.value })} />
+          <select value={novoFuncionario.codEmpresa}
+            onChange={(e) => setNovoFuncionario({ ...novoFuncionario, codEmpresa: e.target.value })}>
+            <option value="">Selecione uma Empresa</option>
+            {empresas.map((empresa) => (
+              <option key={empresa.cod_empresa} value={empresa.cod_empresa}>
+                {empresa.nome}
+              </option>
+            ))}
+          </select>
+          <div className="buttonInsert">
+            <button onClick={inserirFuncionario}>Salvar Funcionário</button>
           </div>
         </div>
       )}
