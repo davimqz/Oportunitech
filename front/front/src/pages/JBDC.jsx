@@ -190,24 +190,43 @@ const JBDC = () => {
 
   const inserirCurso = async () => {
     try {
+      // Validação no frontend
+      if (!novoCurso.nome) {
+        alert("❌ Nome do curso é obrigatório");
+        return;
+      }
+      
+      // Preparar dados
+      const dados = {
+        nome: novoCurso.nome,
+        duracao: novoCurso.duracao ? parseInt(novoCurso.duracao) : null,
+        type: novoCurso.type ? parseInt(novoCurso.type) : 0
+      };
+      
+      console.log("Enviando curso:", dados); // Debug
+      
       const response = await fetch(`${API_URL}/curso`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(novoCurso)
+        body: JSON.stringify(dados)
       });
 
       const result = await response.text();
       alert(result);
-      carregarDados("tb_curso");
-      carregarCursos();
-
-      setNovoCurso({
-        nome: "",
-        duracao: "",
-        type: "0"
-      });
+      
+      if (response.ok) {
+        carregarDados("tb_curso");
+        carregarCursos();
+        
+        // Limpar formulário
+        setNovoCurso({
+          nome: "",
+          duracao: "",
+          type: "0"
+        });
+      }
     } catch (err) {
-      alert("Erro ao inserir curso: " + err.message);
+      alert("❌ Erro ao inserir curso: " + err.message);
     }
   };
 

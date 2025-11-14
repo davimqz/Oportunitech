@@ -251,16 +251,37 @@ public class SqlController {
     @PostMapping("/curso")
     public ResponseEntity<String> inserirCurso(@RequestBody Map<String, Object> body) {
         try {
+            // Validação dos campos obrigatórios
+            if (body.get("nome") == null || body.get("nome").toString().isBlank()) {
+                return ResponseEntity.badRequest().body("❌ Nome do curso é obrigatório");
+            }
+            
+            // Converter duração para Integer
+            Integer duracao = null;
+            if (body.get("duracao") != null && !body.get("duracao").toString().isBlank()) {
+                try {
+                    duracao = Integer.parseInt(body.get("duracao").toString());
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body("❌ Duração deve ser um número válido");
+                }
+            }
+            
+            // Converter type para Integer
+            Integer type = 0; // Default: Graduação
+            if (body.get("type") != null && !body.get("type").toString().isBlank()) {
+                try {
+                    type = Integer.parseInt(body.get("type").toString());
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body("❌ Type deve ser um número válido");
+                }
+            }
+            
             String sql = "INSERT INTO tb_curso (duracao, nome, type) VALUES (?, ?, ?)";
-            int rows = jdbcTemplate.update(
-                    sql,
-                    body.get("duracao"),
-                    body.get("nome"),
-                    body.get("type"));
-            return ResponseEntity.ok("Curso inserido com sucesso! Linhas afetadas: " + rows);
+            int rows = jdbcTemplate.update(sql, duracao, body.get("nome"), type);
+            return ResponseEntity.ok("✅ Curso inserido com sucesso! Linhas afetadas: " + rows);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Erro ao inserir curso: " + e.getMessage());
+            return ResponseEntity.badRequest().body("❌ Erro ao inserir curso: " + e.getMessage());
         }
     }
 
