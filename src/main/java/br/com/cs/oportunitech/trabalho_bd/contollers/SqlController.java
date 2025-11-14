@@ -192,19 +192,47 @@ public class SqlController {
     @PostMapping("/estudante")
     public ResponseEntity<String> inserirEstudante(@RequestBody Map<String, Object> body) {
         try {
+            // Validação dos campos obrigatórios
+            if (body.get("email") == null || body.get("email").toString().isBlank()) {
+                return ResponseEntity.badRequest().body("❌ Email é obrigatório");
+            }
+            if (body.get("primeiroNome") == null || body.get("primeiroNome").toString().isBlank()) {
+                return ResponseEntity.badRequest().body("❌ Primeiro nome é obrigatório");
+            }
+            
+            // Converter idade para Integer, tratando valores vazios
+            Integer idade = null;
+            if (body.get("idade") != null && !body.get("idade").toString().isBlank()) {
+                try {
+                    idade = Integer.parseInt(body.get("idade").toString());
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body("❌ Idade deve ser um número válido");
+                }
+            }
+            
+            // Converter codCurso para Integer, tratando valores vazios
+            Integer codCurso = null;
+            if (body.get("codCurso") != null && !body.get("codCurso").toString().isBlank()) {
+                try {
+                    codCurso = Integer.parseInt(body.get("codCurso").toString());
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body("❌ Código do curso deve ser um número válido");
+                }
+            }
+            
             String sql = "INSERT INTO tb_estudante (email, idade, primeiro_nome, segundo_nome, telefone, cod_curso) VALUES (?, ?, ?, ?, ?, ?)";
             int rows = jdbcTemplate.update(
                     sql,
                     body.get("email"),
-                    body.get("idade"),
+                    idade,
                     body.get("primeiroNome"),
                     body.get("segundoNome"),
                     body.get("telefone"),
-                    body.get("codCurso"));
-            return ResponseEntity.ok("Estudante inserido com sucesso! Linhas afetadas: " + rows);
+                    codCurso);
+            return ResponseEntity.ok("✅ Estudante inserido com sucesso! Linhas afetadas: " + rows);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Erro ao inserir estudante: " + e.getMessage());
+            return ResponseEntity.badRequest().body("❌ Erro ao inserir estudante: " + e.getMessage());
         }
     }
 

@@ -144,17 +144,36 @@ const JBDC = () => {
   };
 
   const inserirEstudante = async () => {
-    try {
-      const response = await fetch(`${API_URL}/estudante`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(novoEstudante)
-      });
+  try {
+    // Validação no frontend
+    if (!novoEstudante.email || !novoEstudante.primeiroNome) {
+      alert("❌ Email e Primeiro Nome são obrigatórios");
+      return;
+    }
+    
+    // Preparar dados - converter strings vazias em null
+    const dados = {
+      email: novoEstudante.email || null,
+      idade: novoEstudante.idade ? parseInt(novoEstudante.idade) : null,
+      primeiroNome: novoEstudante.primeiroNome || null,
+      segundoNome: novoEstudante.segundoNome || null,
+      telefone: novoEstudante.telefone || null,
+      codCurso: novoEstudante.codCurso ? parseInt(novoEstudante.codCurso) : null
+    };
+    
+    const response = await fetch(`${API_URL}/estudante`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dados)
+    });
 
-      const result = await response.text();
-      alert(result);
+    const result = await response.text();
+    alert(result);
+    
+    if (response.ok) {
       carregarDados("tb_estudante");
-
+      
+      // Limpar formulário
       setNovoEstudante({
         primeiroNome: "",
         segundoNome: "",
@@ -163,10 +182,11 @@ const JBDC = () => {
         idade: "",
         codCurso: ""
       });
-    } catch (err) {
-      alert("Erro ao inserir estudante: " + err.message);
     }
-  };
+  } catch (err) {
+    alert("❌ Erro ao inserir estudante: " + err.message);
+  }
+};
 
   const inserirCurso = async () => {
     try {
