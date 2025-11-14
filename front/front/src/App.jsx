@@ -5,7 +5,7 @@ import JBDC from './pages/JBDC';
 import Footer from './components/Footer';
 import Sql from './pages/Sql';
 import Vagas from './pages/Vagas';
-import Dashboard from './pages/Grafico';
+import Dashboard from './pages/Dashboard';
 
 const App = () => {
 

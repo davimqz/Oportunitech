@@ -8,7 +8,8 @@ const JBDC = () => {
   const [cursos, setCursos] = useState([]);
   const [empresas, setEmpresas] = useState([]);
 
-  const API_URL = "https://oportunitech-1.onrender.com/sql";
+  const API_URL = "http://localhost:8080/sql";
+
 
   const [novoEstudante, setNovoEstudante] = useState({
     primeiroNome: "",

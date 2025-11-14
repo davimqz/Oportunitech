@@ -117,12 +117,19 @@ const Dashboard = () => {
     ];
   };
 
-  // 3. Distribuição de Estudantes por Curso (Pizza)
   const estudantesPorCurso = () => {
     const distribuicao = {};
+    
     dados.estudantes.forEach(est => {
-      const curso = est.curso?.nome || 'Sem Curso';
-      distribuicao[curso] = (distribuicao[curso] || 0) + 1;
+      if (est.cod_curso) {
+        // Busca o nome do curso usando cod_curso
+        // Note que o ID na tabela de cursos pode ser 'cod_curso' ou 'id'
+        const curso = dados.cursos.find(c => c.cod_curso === est.cod_curso || c.id === est.cod_curso);
+        const nomeCurso = curso?.nome || `Curso ${est.cod_curso}`;
+        distribuicao[nomeCurso] = (distribuicao[nomeCurso] || 0) + 1;
+      } else {
+        distribuicao['Sem Curso'] = (distribuicao['Sem Curso'] || 0) + 1;
+      }
     });
 
     return Object.entries(distribuicao).map(([nome, value]) => ({ nome, value }));
@@ -130,14 +137,27 @@ const Dashboard = () => {
 
   // 4. Vagas por Modalidade (Barras)
   const vagasPorModalidade = () => {
+    const mapaModalidade = {
+      0: 'Presencial',
+      1: 'Remoto',
+      2: 'Hibrido'
+    };
+
     const distribuicao = {};
+    
     dados.vagas.forEach(vaga => {
-      const modalidade = vaga.modalidades || 'Não especificado';
+      const codigo = vaga.modalidades;
+      const modalidade = mapaModalidade[codigo] || 'Não especificado';
+      
       distribuicao[modalidade] = (distribuicao[modalidade] || 0) + 1;
     });
 
-    return Object.entries(distribuicao).map(([modalidade, quantidade]) => ({ modalidade, quantidade }));
+    return Object.entries(distribuicao).map(([modalidade, quantidade]) => ({
+      modalidade,
+      quantidade
+    }));
   };
+
 
   // 5. Top 10 Empresas com Mais Vagas
   const empresasComMaisVagas = () => {
@@ -177,16 +197,20 @@ const Dashboard = () => {
 
   // 7. Radar - Perfil dos Cursos (Duração vs Estudantes)
   const perfilCursos = () => {
-    return dados.cursos.map(curso => {
-      const qtdEstudantes = dados.estudantes.filter(e => e.curso?.cod_curso === curso.cod_curso).length;
-      return {
-        curso: curso.nome ? curso.nome.substring(0, 15) : 'Sem nome',
-        duracao: curso.duracao || 0,
-        estudantes: qtdEstudantes,
-        popularidade: qtdEstudantes > 0 ? Math.min(100, qtdEstudantes * 10) : 0
-      };
-    }).filter(c => c.duracao > 0);
-  };
+  return dados.cursos.map(curso => {
+    const qtdEstudantes = dados.estudantes.filter(
+      (e) => e.cod_curso === curso.cod_curso || e.curso === curso.cod_curso
+    ).length;
+
+    return {
+      curso: curso.nome ? curso.nome.substring(0, 19) : 'Sem nome',
+      duracao: curso.duracao || 0,
+      estudantes: qtdEstudantes,
+      popularidade: qtdEstudantes > 0 ? Math.min(100, qtdEstudantes * 10) : 0
+    };
+  }).filter(c => c.duracao > 0);
+};
+
 
   // 8. Linha do Tempo - Tendência de Vagas por Empresa
   const tendenciaVagas = () => {

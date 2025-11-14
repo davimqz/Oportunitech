@@ -14,7 +14,8 @@
     font-size: 1.5rem;
     font-weight: bold;
     text-decoration: none;
-    color: white;
+    color: rgb(0, 0, 0);
+    padding-left: 50px;
   }
 
   .nav-link {
@@ -31,6 +32,7 @@
     align-items: center;
     justify-content: right;
     gap: 40px;
+    padding-right: 40px;
   }
 
   .headerOption {
