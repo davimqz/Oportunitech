@@ -378,20 +378,40 @@ public class SqlController {
     @PostMapping("/vaga")
     public ResponseEntity<String> inserirVaga(@RequestBody Map<String, Object> body) {
         try {
+            // Validações
+            if (body.get("titulo") == null || body.get("titulo").toString().isBlank()) {
+                return ResponseEntity.badRequest().body("❌ Título é obrigatório");
+            }
+            if (body.get("codEmpresa") == null || body.get("codEmpresa").toString().isBlank()) {
+                return ResponseEntity.badRequest().body("❌ Empresa é obrigatória");
+            }
+            
+            // Conversões
+            Integer cargaHoraria = null;
+            if (body.get("cargaHoraria") != null && !body.get("cargaHoraria").toString().isBlank()) {
+                cargaHoraria = Integer.parseInt(body.get("cargaHoraria").toString());
+            }
+            
+            Integer modalidades = 0;
+            if (body.get("modalidades") != null && !body.get("modalidades").toString().isBlank()) {
+                modalidades = Integer.parseInt(body.get("modalidades").toString());
+            }
+            
+            Integer codEmpresa = Integer.parseInt(body.get("codEmpresa").toString());
+            
             String sql = "INSERT INTO tb_vaga (titulo, descricao, carga_horaria, modalidades, salario, cod_empresa, logo_link) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            int rows = jdbcTemplate.update(
-                    sql,
+            int rows = jdbcTemplate.update(sql,
                     body.get("titulo"),
                     body.get("descricao"),
-                    body.get("cargaHoraria"),
-                    body.get("modalidades"),
+                    cargaHoraria,
+                    modalidades,
                     body.get("salario"),
-                    body.get("codEmpresa"),
+                    codEmpresa,
                     body.get("logoLink"));
-            return ResponseEntity.ok("Vaga inserida com sucesso! Linhas afetadas: " + rows);
+            return ResponseEntity.ok("✅ Vaga inserida com sucesso! Linhas afetadas: " + rows);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Erro ao inserir vaga: " + e.getMessage());
+            return ResponseEntity.badRequest().body("❌ Erro ao inserir vaga: " + e.getMessage());
         }
     }
 

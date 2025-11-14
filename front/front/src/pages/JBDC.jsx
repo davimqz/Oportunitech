@@ -48,30 +48,7 @@ const JBDC = () => {
     codEmpresa: ""
   });
 
-  // Inserir Funcionário
-  const inserirFuncionario = async () => {
-    try {
-      const response = await fetch(`${API_URL}/funcionario`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(novoFuncionario)
-      });
-
-      const result = await response.text();
-      alert(result);
-      carregarDados("tb_funcionario");
-
-      setNovoFuncionario({
-        primeiroNome: "",
-        segundoNome: "",
-        email: "",
-        codEmpresa: ""
-      });
-    } catch (err) {
-      alert("Erro ao inserir funcionário: " + err.message);
-    }
-  };
-
+  // ===================== CARREGAR DADOS INICIAIS =====================
   useEffect(() => {
     fetch(`${API_URL}/tables`)
       .then(async res => {
@@ -143,67 +120,61 @@ const JBDC = () => {
     }
   };
 
+  // ===================== INSERIR ESTUDANTE =====================
   const inserirEstudante = async () => {
-  try {
-    // Validação no frontend
-    if (!novoEstudante.email || !novoEstudante.primeiroNome) {
-      alert("❌ Email e Primeiro Nome são obrigatórios");
-      return;
-    }
-    
-    // Preparar dados - converter strings vazias em null
-    const dados = {
-      email: novoEstudante.email || null,
-      idade: novoEstudante.idade ? parseInt(novoEstudante.idade) : null,
-      primeiroNome: novoEstudante.primeiroNome || null,
-      segundoNome: novoEstudante.segundoNome || null,
-      telefone: novoEstudante.telefone || null,
-      codCurso: novoEstudante.codCurso ? parseInt(novoEstudante.codCurso) : null
-    };
-    
-    const response = await fetch(`${API_URL}/estudante`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(dados)
-    });
-
-    const result = await response.text();
-    alert(result);
-    
-    if (response.ok) {
-      carregarDados("tb_estudante");
+    try {
+      if (!novoEstudante.email || !novoEstudante.primeiroNome) {
+        alert("❌ Email e Primeiro Nome são obrigatórios");
+        return;
+      }
       
-      // Limpar formulário
-      setNovoEstudante({
-        primeiroNome: "",
-        segundoNome: "",
-        email: "",
-        telefone: "",
-        idade: "",
-        codCurso: ""
+      const dados = {
+        email: novoEstudante.email,
+        idade: novoEstudante.idade ? parseInt(novoEstudante.idade) : null,
+        primeiroNome: novoEstudante.primeiroNome,
+        segundoNome: novoEstudante.segundoNome || null,
+        telefone: novoEstudante.telefone || null,
+        codCurso: novoEstudante.codCurso ? parseInt(novoEstudante.codCurso) : null
+      };
+      
+      const response = await fetch(`${API_URL}/estudante`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
       });
-    }
-  } catch (err) {
-    alert("❌ Erro ao inserir estudante: " + err.message);
-  }
-};
 
+      const result = await response.text();
+      alert(result);
+      
+      if (response.ok) {
+        carregarDados("tb_estudante");
+        setNovoEstudante({
+          primeiroNome: "",
+          segundoNome: "",
+          email: "",
+          telefone: "",
+          idade: "",
+          codCurso: ""
+        });
+      }
+    } catch (err) {
+      alert("❌ Erro ao inserir estudante: " + err.message);
+    }
+  };
+
+  // ===================== INSERIR CURSO =====================
   const inserirCurso = async () => {
     try {
-      // Validação no frontend
       if (!novoCurso.nome) {
         alert("❌ Nome do curso é obrigatório");
         return;
       }
       
-      // Preparar dados
       const dados = {
         nome: novoCurso.nome,
         duracao: novoCurso.duracao ? parseInt(novoCurso.duracao) : null,
         type: novoCurso.type ? parseInt(novoCurso.type) : 0
       };
-      
-      console.log("Enviando curso:", dados); // Debug
       
       const response = await fetch(`${API_URL}/curso`, {
         method: "POST",
@@ -217,8 +188,6 @@ const JBDC = () => {
       if (response.ok) {
         carregarDados("tb_curso");
         carregarCursos();
-        
-        // Limpar formulário
         setNovoCurso({
           nome: "",
           duracao: "",
@@ -230,55 +199,138 @@ const JBDC = () => {
     }
   };
 
+  // ===================== INSERIR EMPRESA =====================
   const inserirEmpresa = async () => {
     try {
+      if (!novaEmpresa.nome) {
+        alert("❌ Nome da empresa é obrigatório");
+        return;
+      }
+      
+      const dados = {
+        nome: novaEmpresa.nome,
+        razaoSocial: novaEmpresa.razaoSocial || null,
+        codEndereco: novaEmpresa.codEndereco ? parseInt(novaEmpresa.codEndereco) : null
+      };
+      
       const response = await fetch(`${API_URL}/empresa`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(novaEmpresa)
+        body: JSON.stringify(dados)
       });
 
       const result = await response.text();
       alert(result);
-      carregarDados("tb_empresa");
-      carregarEmpresas();
-
-      setNovaEmpresa({
-        nome: "",
-        razaoSocial: "",
-        codEndereco: ""
-      });
+      
+      if (response.ok) {
+        carregarDados("tb_empresa");
+        carregarEmpresas();
+        setNovaEmpresa({
+          nome: "",
+          razaoSocial: "",
+          codEndereco: ""
+        });
+      }
     } catch (err) {
-      alert("Erro ao inserir empresa: " + err.message);
+      alert("❌ Erro ao inserir empresa: " + err.message);
     }
   };
 
+  // ===================== INSERIR VAGA =====================
   const inserirVaga = async () => {
     try {
+      if (!novaVaga.titulo) {
+        alert("❌ Título é obrigatório");
+        return;
+      }
+      if (!novaVaga.codEmpresa) {
+        alert("❌ Selecione uma empresa");
+        return;
+      }
+      
+      const dados = {
+        titulo: novaVaga.titulo,
+        descricao: novaVaga.descricao || null,
+        cargaHoraria: novaVaga.cargaHoraria ? parseInt(novaVaga.cargaHoraria) : null,
+        modalidades: novaVaga.modalidades ? parseInt(novaVaga.modalidades) : 0,
+        salario: novaVaga.salario || null,
+        codEmpresa: parseInt(novaVaga.codEmpresa),
+        logoLink: novaVaga.logoLink || null
+      };
+      
       const response = await fetch(`${API_URL}/vaga`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(novaVaga)
+        body: JSON.stringify(dados)
       });
 
       const result = await response.text();
       alert(result);
-      carregarDados("tb_vaga");
-
-      setNovaVaga({
-        titulo: "",
-        descricao: "",
-        cargaHoraria: "",
-        modalidades: "0",
-        salario: "",
-        codEmpresa: "",
-        logoLink: ""
-      });
+      
+      if (response.ok) {
+        carregarDados("tb_vaga");
+        setNovaVaga({
+          titulo: "",
+          descricao: "",
+          cargaHoraria: "",
+          modalidades: "0",
+          salario: "",
+          codEmpresa: "",
+          logoLink: ""
+        });
+      }
     } catch (err) {
-      alert("Erro ao inserir vaga: " + err.message);
+      alert("❌ Erro ao inserir vaga: " + err.message);
     }
   };
 
+  // ===================== INSERIR FUNCIONÁRIO =====================
+  const inserirFuncionario = async () => {
+    try {
+      if (!novoFuncionario.primeiroNome) {
+        alert("❌ Primeiro nome é obrigatório");
+        return;
+      }
+      if (!novoFuncionario.email) {
+        alert("❌ Email é obrigatório");
+        return;
+      }
+      if (!novoFuncionario.codEmpresa) {
+        alert("❌ Selecione uma empresa");
+        return;
+      }
+      
+      const dados = {
+        primeiroNome: novoFuncionario.primeiroNome,
+        segundoNome: novoFuncionario.segundoNome || null,
+        email: novoFuncionario.email,
+        codEmpresa: parseInt(novoFuncionario.codEmpresa)
+      };
+      
+      const response = await fetch(`${API_URL}/funcionario`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      });
+
+      const result = await response.text();
+      alert(result);
+      
+      if (response.ok) {
+        carregarDados("tb_funcionario");
+        setNovoFuncionario({
+          primeiroNome: "",
+          segundoNome: "",
+          email: "",
+          codEmpresa: ""
+        });
+      }
+    } catch (err) {
+      alert("❌ Erro ao inserir funcionário: " + err.message);
+    }
+  };
+
+  // ===================== RENDER RESULT =====================
   const renderResult = () => {
     if (!dados) return null;
 
@@ -355,7 +407,7 @@ const JBDC = () => {
         </div>
       </div>
 
-      {/* Estudante */}
+      {/* ===================== ESTUDANTE ===================== */}
       {tabelaSelecionada === "tb_estudante" && (
         <div className='tabelasInsert'>
           <h2>Inserir Novo Estudante</h2>
@@ -384,7 +436,7 @@ const JBDC = () => {
         </div>
       )}
 
-      {/* Curso */}
+      {/* ===================== CURSO ===================== */}
       {tabelaSelecionada === "tb_curso" && (
         <div className='tabelasInsert'>
           <h2>Inserir Novo Curso</h2>
@@ -404,7 +456,7 @@ const JBDC = () => {
         </div>
       )}
 
-      {/* Empresa */}
+      {/* ===================== EMPRESA ===================== */}
       {tabelaSelecionada === "tb_empresa" && (
         <div className='tabelasInsert'>
           <h2>Inserir Nova Empresa</h2>
@@ -420,7 +472,7 @@ const JBDC = () => {
         </div>
       )}
 
-      {/* Vaga */}
+      {/* ===================== VAGA ===================== */}
       {tabelaSelecionada === "tb_vaga" && (
         <div className='tabelasInsert'>
           <h2>Inserir Nova Vaga</h2>
@@ -455,7 +507,7 @@ const JBDC = () => {
         </div>
       )}
 
-      {/* Funcionário */}
+      {/* ===================== FUNCIONÁRIO ===================== */}
       {tabelaSelecionada === "tb_funcionario" && (
         <div className='tabelasInsert'>
           <h2>Inserir Novo Funcionário</h2>
@@ -480,6 +532,7 @@ const JBDC = () => {
         </div>
       )}
 
+      {/* ===================== TABELA ATUALIZADA ===================== */}
       <div className="tablesSql">
         <h1>Tabela Atualizada</h1>
         {renderResult()}
