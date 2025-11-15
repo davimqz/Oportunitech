@@ -84,3 +84,13 @@
     color: white;
     cursor: pointer;
 }
+
+.tabelasInsert select {
+    width: 420px;
+    height: 50px;
+    border-radius: 15px;
+    background-color: #ddd;
+    border: none;
+    color: #3a3a3a;
+    padding-left: 10px;
+}
