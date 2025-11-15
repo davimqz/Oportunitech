@@ -1,11 +1,14 @@
 package br.com.cs.oportunitech.trabalho_bd.contollers;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +21,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin(
-    origins = "*",
-    allowedHeaders = "*",
-    methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS},
-    allowCredentials = "false" // Set to false when using "*" for origins
-)
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/sql")
 public class SqlController {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private DataSource dataSource;
+
 
     @PostMapping("/execute")
     public ResponseEntity<?> executeSql(@RequestBody Map<String, String> body) {
@@ -498,5 +500,41 @@ public class SqlController {
             return ResponseEntity.badRequest().body("Erro ao inserir funcionário: " + e.getMessage());
         }
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> delete(
+            @RequestParam String table,
+            @RequestParam int id) {
+
+        String sql = "DELETE FROM " + table + " WHERE " + getPrimaryKeyName(table) + " = ?";
+
+        try (Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, id);
+            int rows = stmt.executeUpdate();
+
+            if (rows > 0) {
+                return ResponseEntity.ok("Registro deletado com sucesso!");
+            } else {
+                return ResponseEntity.status(404).body("Nenhum registro encontrado com esse ID.");
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao deletar: " + e.getMessage());
+        }
+    }
+
+    private String getPrimaryKeyName(String table) {
+        return switch (table) {
+            case "tb_estudante" -> "cod_estudante";
+            case "tb_curso" -> "cod_curso";
+            case "tb_empresa" -> "cod_empresa";
+            case "tb_vaga" -> "cod_vaga";
+            case "tb_funcionario" -> "cod_funcionario";
+            default -> "id";
+        };
+    }
+
 
 }

@@ -121,6 +121,30 @@ const JBDC = () => {
     }
   };
 
+  const deletarRegistro = async (id) => {
+    if (!tabelaSelecionada) return alert("Nenhuma tabela selecionada!");
+    if (!id) return alert("ID inválido!");
+
+    if (!window.confirm("Tem certeza que deseja excluir este registro?")) return;
+
+    try {
+      const response = await fetch(`${API_URL}/delete?table=${tabelaSelecionada}&id=${id}`, {
+        method: "DELETE"
+      });
+
+      const result = await response.text();
+      alert(result);
+
+      if (response.ok) {
+        carregarDados(tabelaSelecionada);
+      }
+
+    } catch (err) {
+      alert("❌ Erro ao deletar: " + err.message);
+    }
+  };
+
+
   // ===================== INSERIR ESTUDANTE =====================
   const inserirEstudante = async () => {
     try {
@@ -363,9 +387,14 @@ const JBDC = () => {
                       {value !== null ? value.toString() : 'NULL'}
                     </td>
                   ))}
+                  <td onClick={() => deletarRegistro(row[Object.keys(row)[0]])}>
+                    <i className="fa-solid fa-trash" style={{ cursor: "pointer", color: "red" }}></i>
+                  </td>
+
                 </tr>
               ))}
             </tbody>
+            
           </table>
         </div>
       );
