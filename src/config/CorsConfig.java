@@ -14,11 +14,10 @@ public class CorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    .allowedOrigins(
-                        "**"
-                    )
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                    .allowedOriginPatterns("*") // Permite todos os origens durante desenvolvimento
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD")
                     .allowedHeaders("*")
+                    .exposedHeaders("*")
                     .allowCredentials(true)
                     .maxAge(3600);
             }

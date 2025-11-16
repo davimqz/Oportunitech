@@ -23,10 +23,6 @@ const Header = () => {
                 <a href="/" className="nav-link">Início</a>
               </div>
               <div className="headerOption">
-                <i class="fa-solid fa-chart-simple"></i>
-                <a href="/graficos" className="nav-link">Graficos</a>
-              </div>
-              <div className="headerOption">
                 <i class="fa-solid fa-server"></i>
                 <a href="/visualizar" className="nav-link">Visualizar</a>
               </div>
@@ -36,15 +32,11 @@ const Header = () => {
               </div>
                <div className="headerOption">
                 <i class="fa-solid fa-server"></i>
-                <a href="/sql" className="nav-link">Sql</a>
+                <a href="/sql" className="nav-link">SQL</a>
               </div>
               <div className="headerOption">
                 <i class="fa-solid fa-suitcase"></i>
                 <a href="/vagas" className="nav-link">Vagas</a>
-              </div>
-              <div className="headerOption">
-                <i class="fa-solid fa-info"></i>
-                <a href="/sobre" className="nav-link">Sobre o Projeto</a>
               </div>
             </nav>
 

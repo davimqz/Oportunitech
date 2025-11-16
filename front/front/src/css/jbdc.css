@@ -70,3 +70,27 @@
 .buttonInsert button:hover {
     background-color: #ddd;
 }
+
+.logoTrash {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+}
+
+.logoTrash i {
+    color: white;
+    cursor: pointer;
+}
+
+.tabelasInsert select {
+    width: 420px;
+    height: 50px;
+    border-radius: 15px;
+    background-color: #ddd;
+    border: none;
+    color: #3a3a3a;
+    padding-left: 10px;
+}

@@ -1,9 +1,24 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
-import jakarta.persistence.*;
-import lombok.*;
+import java.util.HashSet;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Setter
@@ -25,6 +40,11 @@ public class Empresa {
     private Endereco endereco;
 
     @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @JsonManagedReference
     private List<Vaga> vagas;
+
+    @OneToMany(mappedBy = "empresa", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Set<Funcionario> funcionarios = new HashSet<>();
+
 }

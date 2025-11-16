@@ -84,6 +84,51 @@
     width: 200px;
 }
 
+.filterContainer {
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    padding-right: 50px;
+    padding-top: 50px;
+}
+
+.filterBox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.filterBox h1 {
+    font-size: 20px;
+}
+
+.filterBox select {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 40px;
+    border-radius: 20px;
+    border: 1px solid black;
+    padding-left: 10px;
+}
+
+.serachFilter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    gap: 10px;
+}
+
+.serachFilter input {
+    width: 80vw;
+    height: 40px;
+    border-radius: 20px;
+    padding-left: 10px;
+}
+
 
 /* Responsividade */
 @media (max-width: 1400px) {
