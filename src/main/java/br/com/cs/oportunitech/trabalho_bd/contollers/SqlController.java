@@ -435,6 +435,18 @@ public class SqlController {
         }
     }
 
+    @GetMapping("/funcionarios")
+    public ResponseEntity<List<Map<String, Object>>> listarFuncionarios() {
+        try {
+            String sql = "SELECT * FROM tb_funcionario";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @PostMapping("/matricular")
     public ResponseEntity<String> matricular(@RequestBody Map<String, Object> body) {
         try {
