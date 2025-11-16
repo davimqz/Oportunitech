@@ -176,5 +176,3 @@ projeto/
 ## 📄 Licença
 
 Este projeto está sob a licença [MIT/Apache/GPL - escolha uma]. Veja o arquivo `LICENSE` para mais detalhes.
-
-**Desenvolvido com ❤️ para conectar estudantes a oportunidades**
