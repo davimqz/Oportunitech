@@ -505,12 +505,22 @@ public class SqlController {
     @PostMapping("/funcionario")
     public ResponseEntity<String> inserirFuncionario(@RequestBody Map<String, Object> body) {
         try {
-            String sql = "INSERT INTO tb_funcionario (primeiro_nome, segundo_nome, email, cod_empresa) VALUES (?, ?, ?, ?)";
+            Integer cargo = 1; 
+            if (body.get("cargo") != null && !body.get("cargo").toString().isBlank()) {
+                try {
+                    cargo = Integer.parseInt(body.get("cargo").toString());
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body("⚠ Cargo deve ser um número válido");
+                }
+            }
+            
+            String sql = "INSERT INTO tb_funcionario (primeiro_nome, segundo_nome, email, cargo, cod_empresa) VALUES (?, ?, ?, ?, ?)";
             int rows = jdbcTemplate.update(
                     sql,
                     body.get("primeiroNome"),
                     body.get("segundoNome"),
                     body.get("email"),
+                    cargo,
                     body.get("codEmpresa"));
             return ResponseEntity.ok("Funcionário inserido com sucesso! Linhas afetadas: " + rows);
         } catch (Exception e) {

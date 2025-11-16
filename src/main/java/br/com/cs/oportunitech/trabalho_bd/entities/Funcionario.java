@@ -1,5 +1,6 @@
 package br.com.cs.oportunitech.trabalho_bd.entities;
 
+import br.com.cs.oportunitech.trabalho_bd.entities.Enum.FuncionarioEnum;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,6 +28,7 @@ public class Funcionario {
     private String primeiroNome;
     private String segundoNome;
     private String email;
+    private FuncionarioEnum cargo;
 
     @ManyToOne
     @JoinColumn(name = "cod_empresa")

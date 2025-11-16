@@ -52,7 +52,8 @@ const JBDC = () => {
     primeiroNome: "",
     segundoNome: "",
     email: "",
-    codEmpresa: ""
+    codEmpresa: "",
+    cargo: "0"
   });
 
   const [novoEndereco, setNovoEndereco] = useState({
@@ -759,6 +760,11 @@ const JBDC = () => {
             onChange={(e) => setNovoFuncionario({ ...novoFuncionario, segundoNome: e.target.value })} />
           <input type="email" placeholder="Email" value={novoFuncionario.email}
             onChange={(e) => setNovoFuncionario({ ...novoFuncionario, email: e.target.value })} />
+          <select value={novoFuncionario.cargo}
+            onChange={(e) => setNovoFuncionario({ ...novoFuncionario, cargo: e.target.value })}>
+            <option value="0">Gerente</option>
+            <option value="1">Comum</option>
+          </select>
           <select value={novoFuncionario.codEmpresa}
             onChange={(e) => setNovoFuncionario({ ...novoFuncionario, codEmpresa: e.target.value })}>
             <option value="">Selecione uma Empresa</option>
@@ -773,7 +779,6 @@ const JBDC = () => {
           </div>
         </div>
       )}
-
       {/* ===================== ENDEREÇO ===================== */}
       {tabelaSelecionada === "endereco" && (
         <div className='tabelasInsert'>
@@ -814,16 +819,18 @@ const JBDC = () => {
             onChange={(e) => setNovoDepartamento({ ...novoDepartamento, nome: e.target.value })} 
           />
           
-          <select 
-            value={novoDepartamento.codFuncionario}
-            onChange={(e) => setNovoDepartamento({ ...novoDepartamento, codFuncionario: e.target.value })}>
-            <option value="">Selecione um Funcionário Responsável (Opcional)</option>
-            {funcionarios.map((func) => (
+         <select 
+          value={novoDepartamento.codFuncionario}
+          onChange={(e) => setNovoDepartamento({ ...novoDepartamento, codFuncionario: e.target.value })}>
+          <option value="">Selecione um Funcionário Responsável (Opcional)</option>
+          {funcionarios.map((func) => (
+            func.cargo === 1 && (
               <option key={func.cod_funcionario} value={func.cod_funcionario}>
                 {func.primeiro_nome} {func.segundo_nome} - {func.email}
               </option>
-            ))}
-          </select>
+            )
+          ))}
+        </select>
           
           <select 
             value={novoDepartamento.supervisorId}
