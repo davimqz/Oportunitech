@@ -14,7 +14,6 @@
     font-size: 1.5rem;
     font-weight: bold;
     text-decoration: none;
-    color: rgb(0, 0, 0);
     padding-left: 50px;
   }
 
@@ -23,8 +22,12 @@
     padding: 0.5rem 0.75rem;
     font-weight: bold;
     transition: all ease-in-out 0.2s;
-    color: #000000;
     font-weight: bold;
+    color: black;
+  }
+
+  .nav-link:hover {
+    color: white;
   }
 
   .nav-desktop {
@@ -47,8 +50,11 @@
     color: white;
   }
 
-  .headerOption a:hover { 
-    border-bottom: 1px solid black;
+  .headerOption:hover { 
+    background-color: rgb(138, 138, 138);
+    padding: 10px 10px;
+    color: white;
+    border-radius: 10px;
   }
 
   .actions-desktop {

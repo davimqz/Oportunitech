@@ -174,7 +174,6 @@ const Dashboard = () => {
   };
 
 
-
   // 6. Análise de Carga Horária das Vagas
   const distribuicaoCargaHoraria = () => {
     const cargas = dados.vagas.map(v => v.carga_horaria || 0).filter(c => c > 0);
