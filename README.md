@@ -1,41 +1,59 @@
 # 🎓 Sistema de Gestão de Vagas e Estágios
 
+> Projeto acadêmico desenvolvido para a disciplina de Banco de Dados
+
 Plataforma web completa para gerenciamento de vagas de emprego e estágios, conectando estudantes a oportunidades profissionais de forma eficiente e organizada.
 
 ## 📋 Sobre o Projeto
 
-O Sistema de Gestão de Vagas e Estágios é uma aplicação full-stack desenvolvida para facilitar o processo de conexão entre empresas que oferecem oportunidades e estudantes em busca de estágios e empregos. A plataforma oferece ferramentas completas de gerenciamento de dados, visualização analítica e cadastro de candidatos.
+O Sistema de Gestão de Vagas e Estágios é um projeto acadêmico desenvolvido para a disciplina de Banco de Dados, com o objetivo de aplicar conceitos de modelagem, implementação e manipulação de bancos de dados relacionais em um cenário prático.
+
+O sistema facilita o processo de conexão entre empresas que oferecem oportunidades e estudantes em busca de estágios e empregos, oferecendo ferramentas completas de gerenciamento de dados, visualização analítica e cadastro de candidatos.
+
+### 🎯 Objetivos Acadêmicos
+
+- Aplicar conceitos de **modelagem de banco de dados** (normalização, relacionamentos, integridade referencial)
+- Implementar operações **CRUD completas** (Create, Read, Update, Delete)
+- Desenvolver **consultas SQL complexas** com joins, agregações e subconsultas
+- Criar **visualizações gráficas** de dados armazenados
+- Integrar banco de dados com aplicação **full-stack**
 
 ### 🏗️ Arquitetura
 
 O projeto utiliza uma arquitetura cliente-servidor com:
 - **Backend:** API RESTful em Java Spring Boot com JPA/Hibernate para persistência
 - **Frontend:** SPA (Single Page Application) em React com Vite
-- **Banco de Dados:** Sistema relacional com entidades bem estruturadas
+- **Banco de Dados:** Sistema relacional com entidades bem estruturadas e relacionamentos complexos
 
 ## ✨ Funcionalidades
 
 ### 🗄️ Gerenciamento de Banco de Dados
-- **Consultas personalizadas** ao banco de dados
-- **Inserção** de novos registros
-- **Atualização** de informações existentes
-- **Exclusão** de dados obsoletos
-- Interface intuitiva para operações CRUD
+- **Consultas SQL personalizadas** com interface interativa
+- **Inserção de dados** através de formulários validados
+- **Atualização** de registros existentes
+- **Exclusão** com confirmação para evitar perda de dados
+- Demonstração prática de **operações CRUD**
 
 ### 📊 Dashboard Interativo
-- Gráficos dinâmicos com dados em tempo real
-- Visualização de estatísticas de vagas
-- Métricas de candidatos cadastrados
-- Análise de tendências do mercado
+- Gráficos dinâmicos com dados em tempo real do banco
+- Estatísticas de vagas cadastradas por empresa/departamento
+- Métricas de estudantes e cursos
+- Análise de entrevistas realizadas
+- Visualização de tendências e distribuições
 
 ### 👥 Gestão de Estudantes
-- Lista completa de estudantes cadastrados
-- Formulário de cadastro integrado
-- Perfis detalhados dos candidatos
-- Filtros e busca avançada
+- Lista completa de estudantes cadastrados via formulário
+- Perfis detalhados com informações acadêmicas
+- Relacionamento com cursos e departamentos
+- Histórico de entrevistas e candidaturas
 
 ### 💼 Visualização de Vagas
 - Listagem de todas as vagas disponíveis
+
+### 🔍 Consultas SQL Diretas
+- Interface para execução de queries SQL customizadas
+- Visualização de resultados em tabelas formatadas
+- Ferramenta educacional para aprendizado de SQL
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -136,10 +154,10 @@ projeto/
 │       │   └── Visualizar.jsx
 │       ├── css/            # Estilos CSS
 │       └── pages/          # Páginas da aplicação
-│           ├── Dashboard.jsx
-│           ├── JBDC.jsx
-│           ├── Sql.jsx
-│           └── Vagas.jsx
+│           ├── Dashboard.jsx    # Gráficos e estatísticas
+│           ├── JBDC.jsx        # Interface JDBC
+│           ├── Sql.jsx         # Executor de queries SQL
+│           └── Vagas.jsx       # Listagem de vagas
 ├── src/                     # Backend Java Spring Boot
 │   ├── main/
 │   │   ├── java/br/com/oportunitech/
@@ -147,7 +165,7 @@ projeto/
 │   │   │   ├── controllers/      # Controllers REST
 │   │   │   │   ├── SqlController.java
 │   │   │   │   └── VagasController.java
-│   │   │   ├── entities/         # Entidades JPA
+│   │   │   ├── entities/         # Entidades JPA (Modelo de Dados)
 │   │   │   │   ├── Curso.java
 │   │   │   │   ├── Departamento.java
 │   │   │   │   ├── Empresa.java
@@ -173,6 +191,33 @@ projeto/
 └── README.md
 ```
 
+## 💾 Modelo de Dados
+
+O banco de dados conta com as seguintes entidades principais:
+
+- **Estudante**: Informações dos candidatos a vagas
+- **Curso**: Cursos acadêmicos dos estudantes
+- **Departamento**: Departamentos organizacionais
+- **Empresa**: Empresas que oferecem vagas
+- **Vaga**: Oportunidades de emprego/estágio
+- **Entrevista**: Processos seletivos agendados
+- **Funcionario**: Colaboradores das empresas
+- **Endereco**: Localização geográfica
+
+*Relacionamentos entre as entidades demonstram conceitos de cardinalidade (1:N, N:M) e integridade referencial.*
+
+## 🤝 Contribuindo
+
+Contribuições são sempre bem-vindas! Para contribuir:
+
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
+4. Push para a branch (`git push origin feature/MinhaFeature`)
+5. Abra um Pull Request
+
 ## 📄 Licença
 
 Este projeto está sob a licença [MIT/Apache/GPL - escolha uma]. Veja o arquivo `LICENSE` para mais detalhes.
+
+⭐ Projeto desenvolvido como atividade acadêmica - Disciplina de Banco de Dados
