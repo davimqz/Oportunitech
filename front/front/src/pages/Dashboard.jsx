@@ -161,10 +161,19 @@ const Dashboard = () => {
 
   // 5. Top 10 Empresas com Mais Vagas
   const empresasComMaisVagas = () => {
+    const mapaEmpresas = {};
+    dados.empresas?.forEach(e => {
+      mapaEmpresas[e.cod_empresa] = e.nome || 'Sem nome';
+    });
+
     const vagasPorEmpresa = {};
-    dados.vagas.forEach(vaga => {
-      const empresa = vaga.nome_empresa || 'Sem nome';
-      vagasPorEmpresa[empresa] = (vagasPorEmpresa[empresa] || 0) + 1;
+
+    dados.vagas?.forEach(vaga => {
+      const nomeEmpresa = vaga.empresa?.cod_empresa
+        ? mapaEmpresas[vaga.empresa.cod_empresa] || 'Sem nome'
+        : 'Sem nome';
+
+      vagasPorEmpresa[nomeEmpresa] = (vagasPorEmpresa[nomeEmpresa] || 0) + 1;
     });
 
     return Object.entries(vagasPorEmpresa)
@@ -172,6 +181,8 @@ const Dashboard = () => {
       .sort((a, b) => b.vagas - a.vagas)
       .slice(0, 10);
   };
+
+
 
   // 6. Análise de Carga Horária das Vagas
   const distribuicaoCargaHoraria = () => {

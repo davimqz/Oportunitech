@@ -401,7 +401,12 @@ public class SqlController {
             
             Integer codEmpresa = Integer.parseInt(body.get("codEmpresa").toString());
             
-            String sql = "INSERT INTO tb_vaga (titulo, descricao, carga_horaria, modalidades, salario, cod_empresa, logo_link) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            // Buscar o nome da empresa
+            String sqlBuscarEmpresa = "SELECT nome FROM tb_empresa WHERE cod_empresa = ?";
+            String nomeEmpresa = jdbcTemplate.queryForObject(sqlBuscarEmpresa, String.class, codEmpresa);
+            
+            // Inserir a vaga com o nome da empresa
+            String sql = "INSERT INTO tb_vaga (titulo, descricao, carga_horaria, modalidades, salario, cod_empresa, nome_empresa, logo_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             int rows = jdbcTemplate.update(sql,
                     body.get("titulo"),
                     body.get("descricao"),
@@ -409,6 +414,7 @@ public class SqlController {
                     modalidades,
                     body.get("salario"),
                     codEmpresa,
+                    nomeEmpresa,
                     body.get("logoLink"));
             return ResponseEntity.ok("✅ Vaga inserida com sucesso! Linhas afetadas: " + rows);
         } catch (Exception e) {
@@ -501,6 +507,58 @@ public class SqlController {
         }
     }
 
+    @PostMapping("/endereco")
+    public ResponseEntity<String> inserirEndereco(@RequestBody Map<String, Object> body) {
+        try {
+            // Validação dos campos obrigatórios
+            if (body.get("rua") == null || body.get("rua").toString().isBlank()) {
+                return ResponseEntity.badRequest().body("❌ Rua é obrigatória");
+            }
+            if (body.get("cidade") == null || body.get("cidade").toString().isBlank()) {
+                return ResponseEntity.badRequest().body("❌ Cidade é obrigatória");
+            }
+            if (body.get("estado") == null || body.get("estado").toString().isBlank()) {
+                return ResponseEntity.badRequest().body("❌ Estado é obrigatório");
+            }
+            
+            // Converter codEmpresa para Integer
+            Integer codEmpresa = null;
+            if (body.get("codEmpresa") != null && !body.get("codEmpresa").toString().isBlank()) {
+                try {
+                    codEmpresa = Integer.parseInt(body.get("codEmpresa").toString());
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body("❌ Código da empresa deve ser um número válido");
+                }
+            }
+            
+            String sql = "INSERT INTO endereco (rua, numero, bairro, cidade, estado, cod_empresa) VALUES (?, ?, ?, ?, ?, ?)";
+            int rows = jdbcTemplate.update(
+                    sql,
+                    body.get("rua"),
+                    body.get("numero"),
+                    body.get("bairro"),
+                    body.get("cidade"),
+                    body.get("estado"),
+                    codEmpresa);
+            return ResponseEntity.ok("✅ Endereço inserido com sucesso! Linhas afetadas: " + rows);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("❌ Erro ao inserir endereço: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/enderecos")
+    public ResponseEntity<List<Map<String, Object>>> listarEnderecos() {
+        try {
+            String sql = "SELECT * FROM endereco";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(
             @RequestParam String table,
@@ -525,6 +583,99 @@ public class SqlController {
         }
     }
 
+    @PostMapping("/departamento")
+    public ResponseEntity<String> inserirDepartamento(@RequestBody Map<String, Object> body) {
+        try {
+            // Validação dos campos obrigatórios
+            if (body.get("nome") == null || body.get("nome").toString().isBlank()) {
+                return ResponseEntity.badRequest().body("❌ Nome do departamento é obrigatório");
+            }
+            
+            // Converter codFuncionario para Long
+            Long codFuncionario = null;
+            if (body.get("codFuncionario") != null && !body.get("codFuncionario").toString().isBlank()) {
+                try {
+                    codFuncionario = Long.parseLong(body.get("codFuncionario").toString());
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body("❌ Código do funcionário deve ser um número válido");
+                }
+            }
+            
+            // Converter supervisorId para Long (auto-relacionamento)
+            Long supervisorId = null;
+            if (body.get("supervisorId") != null && !body.get("supervisorId").toString().isBlank()) {
+                try {
+                    supervisorId = Long.parseLong(body.get("supervisorId").toString());
+                } catch (NumberFormatException e) {
+                    return ResponseEntity.badRequest().body("❌ ID do supervisor deve ser um número válido");
+                }
+            }
+            
+            String sql = "INSERT INTO tb_departamento (nome, cod_funcionario, supervisor_id) VALUES (?, ?, ?)";
+            int rows = jdbcTemplate.update(sql, body.get("nome"), codFuncionario, supervisorId);
+            return ResponseEntity.ok("✅ Departamento inserido com sucesso! Linhas afetadas: " + rows);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("❌ Erro ao inserir departamento: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/departamentos")
+    public ResponseEntity<List<Map<String, Object>>> listarDepartamentos() {
+        try {
+            String sql = "SELECT d.*, " +
+                        "f.primeiro_nome as funcionario_nome, " +
+                        "s.nome as supervisor_nome " +
+                        "FROM tb_departamento d " +
+                        "LEFT JOIN tb_funcionario f ON d.cod_funcionario = f.cod_funcionario " +
+                        "LEFT JOIN tb_departamento s ON d.supervisor_id = s.cod_dep";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/departamento/{id}")
+    public ResponseEntity<?> buscarDepartamentoPorId(@PathVariable Long id) {
+        try {
+            String sql = "SELECT d.*, " +
+                        "f.primeiro_nome as funcionario_nome, " +
+                        "s.nome as supervisor_nome " +
+                        "FROM tb_departamento d " +
+                        "LEFT JOIN tb_funcionario f ON d.cod_funcionario = f.cod_funcionario " +
+                        "LEFT JOIN tb_departamento s ON d.supervisor_id = s.cod_dep " +
+                        "WHERE d.cod_dep = ?";
+            Map<String, Object> result = jdbcTemplate.queryForMap(sql, id);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao buscar departamento: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/departamento/{id}")
+    public ResponseEntity<String> atualizarDepartamento(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        try {
+            String sql = "UPDATE tb_departamento SET nome = ?, cod_funcionario = ?, supervisor_id = ? WHERE cod_dep = ?";
+            int rows = jdbcTemplate.update(
+                    sql,
+                    body.get("nome"),
+                    body.get("codFuncionario"),
+                    body.get("supervisorId"),
+                    id);
+            if (rows > 0) {
+                return ResponseEntity.ok("✅ Departamento atualizado com sucesso! Linhas afetadas: " + rows);
+            } else {
+                return ResponseEntity.badRequest().body("Departamento não encontrado");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Erro ao atualizar departamento: " + e.getMessage());
+        }
+    }
+
     private String getPrimaryKeyName(String table) {
         return switch (table) {
             case "tb_estudante" -> "cod_estudante";
@@ -532,9 +683,9 @@ public class SqlController {
             case "tb_empresa" -> "cod_empresa";
             case "tb_vaga" -> "cod_vaga";
             case "tb_funcionario" -> "cod_funcionario";
+            case "tb_departamento" -> "cod_dep";
+            case "endereco" -> "cod_endereco";
             default -> "id";
         };
     }
-
-
 }

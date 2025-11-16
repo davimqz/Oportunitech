@@ -7,9 +7,10 @@ const JBDC = () => {
   const [loading, setLoading] = useState(false);
   const [cursos, setCursos] = useState([]);
   const [empresas, setEmpresas] = useState([]);
+  const [funcionarios, setFuncionarios] = useState([]);
+  const [departamentos, setDepartamentos] = useState([]);
 
   const API_URL = "http://localhost:8080/sql";
-
 
   const [novoEstudante, setNovoEstudante] = useState({
     primeiroNome: "",
@@ -29,7 +30,12 @@ const JBDC = () => {
   const [novaEmpresa, setNovaEmpresa] = useState({
     nome: "",
     razaoSocial: "",
-    codEndereco: ""
+    codEndereco: "",
+    rua: "",
+    numero: "",
+    bairro: "",
+    cidade: "",
+    estado: ""
   });
 
   const [novaVaga, setNovaVaga] = useState({
@@ -47,6 +53,21 @@ const JBDC = () => {
     segundoNome: "",
     email: "",
     codEmpresa: ""
+  });
+
+  const [novoEndereco, setNovoEndereco] = useState({
+    rua: "",
+    numero: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
+    codEmpresa: ""
+  });
+
+  const [novoDepartamento, setNovoDepartamento] = useState({
+    nome: "",
+    codFuncionario: "",
+    supervisorId: ""
   });
 
   // ===================== CARREGAR DADOS INICIAIS =====================
@@ -67,6 +88,8 @@ const JBDC = () => {
 
     carregarCursos();
     carregarEmpresas();
+    carregarFuncionarios();
+    carregarDepartamentos();
   }, []);
 
   const carregarCursos = async () => {
@@ -79,6 +102,16 @@ const JBDC = () => {
     }
   };
 
+  const carregarEnderecos = async () => {
+    try {
+      const response = await fetch(`${API_URL}/enderecos`);
+      const data = await response.json();
+      setCursos(data);
+    } catch (err) {
+      console.error("Erro ao carregar Endereços:", err);
+    }
+  };
+
   const carregarEmpresas = async () => {
     try {
       const response = await fetch(`${API_URL}/empresas`);
@@ -86,6 +119,30 @@ const JBDC = () => {
       setEmpresas(data);
     } catch (err) {
       console.error("Erro ao carregar empresas:", err);
+    }
+  };
+
+  const carregarFuncionarios = async () => {
+    try {
+      const response = await fetch(`${API_URL}/execute`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sql: "SELECT * FROM tb_funcionario" })
+      });
+      const data = await response.json();
+      setFuncionarios(data);
+    } catch (err) {
+      console.error("Erro ao carregar funcionários:", err);
+    }
+  };
+
+  const carregarDepartamentos = async () => {
+    try {
+      const response = await fetch(`${API_URL}/departamentos`);
+      const data = await response.json();
+      setDepartamentos(data);
+    } catch (err) {
+      console.error("Erro ao carregar departamentos:", err);
     }
   };
 
@@ -143,7 +200,6 @@ const JBDC = () => {
       alert("❌ Erro ao deletar: " + err.message);
     }
   };
-
 
   // ===================== INSERIR ESTUDANTE =====================
   const inserirEstudante = async () => {
@@ -232,30 +288,73 @@ const JBDC = () => {
         return;
       }
       
-      const dados = {
+      const dadosEmpresa = {
         nome: novaEmpresa.nome,
         razaoSocial: novaEmpresa.razaoSocial || null,
-        codEndereco: novaEmpresa.codEndereco ? parseInt(novaEmpresa.codEndereco) : null
+        codEndereco: null
       };
       
-      const response = await fetch(`${API_URL}/empresa`, {
+      const responseEmpresa = await fetch(`${API_URL}/empresa`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(dados)
+        body: JSON.stringify(dadosEmpresa)
       });
 
-      const result = await response.text();
-      alert(result);
-      
-      if (response.ok) {
-        carregarDados("tb_empresa");
-        carregarEmpresas();
-        setNovaEmpresa({
-          nome: "",
-          razaoSocial: "",
-          codEndereco: ""
-        });
+      if (!responseEmpresa.ok) {
+        const error = await responseEmpresa.text();
+        alert("❌ Erro ao criar empresa: " + error);
+        return;
       }
+
+      const empresaCriada = await responseEmpresa.json();
+      const codEmpresa = empresaCriada.cod_empresa;
+
+      if (novaEmpresa.rua && novaEmpresa.cidade && novaEmpresa.estado) {
+        const dadosEndereco = {
+          rua: novaEmpresa.rua,
+          numero: novaEmpresa.numero || null,
+          bairro: novaEmpresa.bairro || null,
+          cidade: novaEmpresa.cidade,
+          estado: novaEmpresa.estado,
+          codEmpresa: codEmpresa
+        };
+
+        const responseEndereco = await fetch(`${API_URL}/endereco`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dadosEndereco)
+        });
+
+        if (responseEndereco.ok) {
+          const enderecoCriado = await responseEndereco.json();
+          const codEndereco = enderecoCriado.cod_endereco;
+
+          await fetch(`${API_URL}/empresa/${codEmpresa}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ codEndereco: codEndereco })
+          });
+
+          alert("✅ Empresa e endereço criados e associados com sucesso!");
+        } else {
+          alert("✅ Empresa criada, mas erro ao criar endereço.");
+        }
+      } else {
+        alert("✅ Empresa criada com sucesso!");
+      }
+      
+      carregarDados("tb_empresa");
+      carregarEmpresas();
+      setNovaEmpresa({
+        nome: "",
+        razaoSocial: "",
+        codEndereco: "",
+        rua: "",
+        numero: "",
+        bairro: "",
+        cidade: "",
+        estado: ""
+      });
     } catch (err) {
       alert("❌ Erro ao inserir empresa: " + err.message);
     }
@@ -273,6 +372,15 @@ const JBDC = () => {
         return;
       }
       
+      const empresaSelecionada = empresas.find(
+        emp => emp.cod_empresa.toString() === novaVaga.codEmpresa.toString()
+      );
+      
+      if (!empresaSelecionada) {
+        alert("❌ Empresa não encontrada");
+        return;
+      }
+      
       const dados = {
         titulo: novaVaga.titulo,
         descricao: novaVaga.descricao || null,
@@ -280,6 +388,7 @@ const JBDC = () => {
         modalidades: novaVaga.modalidades ? parseInt(novaVaga.modalidades) : 0,
         salario: novaVaga.salario || null,
         codEmpresa: parseInt(novaVaga.codEmpresa),
+        nomeEmpresa: empresaSelecionada.nome,
         logoLink: novaVaga.logoLink || null
       };
       
@@ -343,6 +452,7 @@ const JBDC = () => {
       
       if (response.ok) {
         carregarDados("tb_funcionario");
+        carregarFuncionarios();
         setNovoFuncionario({
           primeiroNome: "",
           segundoNome: "",
@@ -352,6 +462,93 @@ const JBDC = () => {
       }
     } catch (err) {
       alert("❌ Erro ao inserir funcionário: " + err.message);
+    }
+  };
+
+  const inserirEndereco = async () => {
+    try {
+      if (!novoEndereco.rua) {
+        alert("❌ Rua é obrigatória");
+        return;
+      }
+      if (!novoEndereco.cidade) {
+        alert("❌ Cidade é obrigatória");
+        return;
+      }
+      if (!novoEndereco.estado) {
+        alert("❌ Estado é obrigatório");
+        return;
+      }
+      
+      const dados = {
+        rua: novoEndereco.rua,
+        numero: novoEndereco.numero || null,
+        bairro: novoEndereco.bairro || null,
+        cidade: novoEndereco.cidade,
+        estado: novoEndereco.estado,
+        codEmpresa: novoEndereco.codEmpresa ? parseInt(novoEndereco.codEmpresa) : null
+      };
+      
+      const response = await fetch(`${API_URL}/endereco`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      });
+
+      const result = await response.text();
+      alert(result);
+      
+      if (response.ok) {
+        carregarDados("endereco");
+        carregarEnderecos();
+        setNovoEndereco({
+          rua: "",
+          numero: "",
+          bairro: "",
+          cidade: "",
+          estado: "",
+          codEmpresa: ""
+        });
+      }
+    } catch (err) {
+      alert("❌ Erro ao inserir endereço: " + err.message);
+    }
+  };
+
+  // ===================== INSERIR DEPARTAMENTO =====================
+  const inserirDepartamento = async () => {
+    try {
+      if (!novoDepartamento.nome) {
+        alert("❌ Nome do departamento é obrigatório");
+        return;
+      }
+      
+      const dados = {
+        nome: novoDepartamento.nome,
+        codFuncionario: novoDepartamento.codFuncionario ? parseInt(novoDepartamento.codFuncionario) : null,
+        supervisorId: novoDepartamento.supervisorId ? parseInt(novoDepartamento.supervisorId) : null
+      };
+      
+      const response = await fetch(`${API_URL}/departamento`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      });
+
+      const result = await response.text();
+      alert(result);
+      
+      if (response.ok) {
+        carregarDados("tb_departamento");
+        carregarDepartamentos();
+        setNovoDepartamento({
+          nome: "",
+          codFuncionario: "",
+          supervisorId: ""
+        });
+      }
+    } catch (err) {
+      alert("❌ Erro ao inserir departamento: " + err.message);
     }
   };
 
@@ -377,6 +574,7 @@ const JBDC = () => {
                 {Object.keys(dados[0]).map(key => (
                   <th key={key}>{key}</th>
                 ))}
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -390,11 +588,9 @@ const JBDC = () => {
                   <td onClick={() => deletarRegistro(row[Object.keys(row)[0]])}>
                     <i className="fa-solid fa-trash" style={{ cursor: "pointer", color: "red" }}></i>
                   </td>
-
                 </tr>
               ))}
             </tbody>
-            
           </table>
         </div>
       );
@@ -490,12 +686,28 @@ const JBDC = () => {
       {tabelaSelecionada === "tb_empresa" && (
         <div className='tabelasInsert'>
           <h2>Inserir Nova Empresa</h2>
-          <input type="text" placeholder="Nome" value={novaEmpresa.nome}
+          <h3>Dados da Empresa</h3>
+          <input type="text" placeholder="Nome *" value={novaEmpresa.nome}
             onChange={(e) => setNovaEmpresa({ ...novaEmpresa, nome: e.target.value })} />
           <input type="text" placeholder="Razão Social" value={novaEmpresa.razaoSocial}
             onChange={(e) => setNovaEmpresa({ ...novaEmpresa, razaoSocial: e.target.value })} />
-          <input type="number" placeholder="Código do Endereço" value={novaEmpresa.codEndereco}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, codEndereco: e.target.value })} />
+          
+          <h3>Endereço da Empresa (Opcional)</h3>
+          <input type="text" placeholder="Rua" value={novaEmpresa.rua}
+            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, rua: e.target.value })} />
+          <input type="text" placeholder="Número" value={novaEmpresa.numero}
+            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, numero: e.target.value })} />
+          <input type="text" placeholder="Bairro" value={novaEmpresa.bairro}
+            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, bairro: e.target.value })} />
+          <input type="text" placeholder="Cidade" value={novaEmpresa.cidade}
+            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, cidade: e.target.value })} />
+          <input type="text" placeholder="Estado (UF)" maxLength="2" value={novaEmpresa.estado}
+            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, estado: e.target.value.toUpperCase() })} />
+          
+          <p style={{fontSize: '12px', color: '#666', marginTop: '10px'}}>
+            💡 Preencha os dados de endereço para criar empresa e endereço juntos
+          </p>
+          
           <div className="buttonInsert">
             <button onClick={inserirEmpresa}>Salvar Empresa</button>
           </div>
@@ -558,6 +770,78 @@ const JBDC = () => {
           </select>
           <div className="buttonInsert">
             <button onClick={inserirFuncionario}>Salvar Funcionário</button>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== ENDEREÇO ===================== */}
+      {tabelaSelecionada === "endereco" && (
+        <div className='tabelasInsert'>
+          <h2>Inserir Novo Endereço</h2>
+          <input type="text" placeholder="Rua *" value={novoEndereco.rua}
+            onChange={(e) => setNovoEndereco({ ...novoEndereco, rua: e.target.value })} />
+          <input type="text" placeholder="Número" value={novoEndereco.numero}
+            onChange={(e) => setNovoEndereco({ ...novoEndereco, numero: e.target.value })} />
+          <input type="text" placeholder="Bairro" value={novoEndereco.bairro}
+            onChange={(e) => setNovoEndereco({ ...novoEndereco, bairro: e.target.value })} />
+          <input type="text" placeholder="Cidade *" value={novoEndereco.cidade}
+            onChange={(e) => setNovoEndereco({ ...novoEndereco, cidade: e.target.value })} />
+          <input type="text" placeholder="Estado (UF) *" maxLength="2" value={novoEndereco.estado}
+            onChange={(e) => setNovoEndereco({ ...novoEndereco, estado: e.target.value.toUpperCase() })} />
+          <select value={novoEndereco.codEmpresa}
+            onChange={(e) => setNovoEndereco({ ...novoEndereco, codEmpresa: e.target.value })}>
+            <option value="">Selecione uma Empresa (Opcional)</option>
+            {empresas.map((empresa) => (
+              <option key={empresa.cod_empresa} value={empresa.cod_empresa}>
+                {empresa.nome}
+              </option>
+            ))}
+          </select>
+          <div className="buttonInsert">
+            <button onClick={inserirEndereco}>Salvar Endereço</button>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== DEPARTAMENTO ===================== */}
+      {tabelaSelecionada === "tb_departamento" && (
+        <div className='tabelasInsert'>
+          <h2>Inserir Novo Departamento</h2>
+          <input 
+            type="text" 
+            placeholder="Nome do Departamento *" 
+            value={novoDepartamento.nome}
+            onChange={(e) => setNovoDepartamento({ ...novoDepartamento, nome: e.target.value })} 
+          />
+          
+          <select 
+            value={novoDepartamento.codFuncionario}
+            onChange={(e) => setNovoDepartamento({ ...novoDepartamento, codFuncionario: e.target.value })}>
+            <option value="">Selecione um Funcionário Responsável (Opcional)</option>
+            {funcionarios.map((func) => (
+              <option key={func.cod_funcionario} value={func.cod_funcionario}>
+                {func.primeiro_nome} {func.segundo_nome} - {func.email}
+              </option>
+            ))}
+          </select>
+          
+          <select 
+            value={novoDepartamento.supervisorId}
+            onChange={(e) => setNovoDepartamento({ ...novoDepartamento, supervisorId: e.target.value })}>
+            <option value="">Selecione um Departamento Supervisor (Opcional)</option>
+            {departamentos.map((dept) => (
+              <option key={dept.cod_dep} value={dept.cod_dep}>
+                {dept.nome}
+              </option>
+            ))}
+          </select>
+          
+          <p style={{fontSize: '12px', color: '#666', marginTop: '10px'}}>
+            💡 O departamento supervisor cria uma hierarquia entre departamentos
+          </p>
+          
+          <div className="buttonInsert">
+            <button onClick={inserirDepartamento}>Salvar Departamento</button>
           </div>
         </div>
       )}
