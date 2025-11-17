@@ -289,10 +289,44 @@ const JBDC = () => {
         return;
       }
       
+      // Primeiro, criar o endereço se fornecido
+      let codEndereco = null;
+      
+      if (novaEmpresa.rua && novaEmpresa.cidade && novaEmpresa.estado) {
+        const dadosEndereco = {
+          rua: novaEmpresa.rua,
+          numero: novaEmpresa.numero || null,
+          bairro: novaEmpresa.bairro || null,
+          cidade: novaEmpresa.cidade,
+          estado: novaEmpresa.estado,
+          codEmpresa: null // Será atualizado depois
+        };
+
+        const responseEndereco = await fetch(`${API_URL}/endereco`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dadosEndereco)
+        });
+
+        if (!responseEndereco.ok) {
+          const error = await responseEndereco.text();
+          alert("❌ Erro ao criar endereço: " + error);
+          return;
+        }
+
+        const resultEndereco = await responseEndereco.text();
+        // Extrair cod_endereco da resposta (assumindo que retorna algo como "Endereço inserido com sucesso! Linhas afetadas: 1")
+        // Vamos fazer uma consulta para pegar o último endereço inserido
+        const enderecosResponse = await fetch(`${API_URL}/enderecos`);
+        const enderecos = await enderecosResponse.json();
+        codEndereco = enderecos[enderecos.length - 1].cod_endereco;
+      }
+      
+      // Criar a empresa com o cod_endereco
       const dadosEmpresa = {
         nome: novaEmpresa.nome,
         razaoSocial: novaEmpresa.razaoSocial || null,
-        codEndereco: null
+        codEndereco: codEndereco
       };
       
       const responseEmpresa = await fetch(`${API_URL}/empresa`, {
@@ -308,41 +342,19 @@ const JBDC = () => {
       }
 
       const empresaCriada = await responseEmpresa.json();
-      const codEmpresa = empresaCriada.cod_empresa;
-
-      if (novaEmpresa.rua && novaEmpresa.cidade && novaEmpresa.estado) {
-        const dadosEndereco = {
-          rua: novaEmpresa.rua,
-          numero: novaEmpresa.numero || null,
-          bairro: novaEmpresa.bairro || null,
-          cidade: novaEmpresa.cidade,
-          estado: novaEmpresa.estado,
-          codEmpresa: codEmpresa
-        };
-
-        const responseEndereco = await fetch(`${API_URL}/endereco`, {
+      
+      // Se criou endereço, atualizar o cod_empresa no endereço
+      if (codEndereco) {
+        await fetch(`${API_URL}/execute`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(dadosEndereco)
+          body: JSON.stringify({ 
+            sql: `UPDATE endereco SET cod_empresa = ${empresaCriada.cod_empresa} WHERE cod_endereco = ${codEndereco}` 
+          })
         });
-
-        if (responseEndereco.ok) {
-          const enderecoCriado = await responseEndereco.json();
-          const codEndereco = enderecoCriado.cod_endereco;
-
-          await fetch(`${API_URL}/empresa/${codEmpresa}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ codEndereco: codEndereco })
-          });
-
-          alert("✅ Empresa e endereço criados e associados com sucesso!");
-        } else {
-          alert("✅ Empresa criada, mas erro ao criar endereço.");
-        }
-      } else {
-        alert("✅ Empresa criada com sucesso!");
       }
+
+      alert("✅ Empresa criada com sucesso!");
       
       carregarDados("tb_empresa");
       carregarEmpresas();
@@ -687,28 +699,12 @@ const JBDC = () => {
       {tabelaSelecionada === "tb_empresa" && (
         <div className='tabelasInsert'>
           <h2>Inserir Nova Empresa</h2>
-          <h3>Dados da Empresa</h3>
-          <input type="text" placeholder="Nome *" value={novaEmpresa.nome}
+          <input type="text" placeholder="Nome" value={novaEmpresa.nome}
             onChange={(e) => setNovaEmpresa({ ...novaEmpresa, nome: e.target.value })} />
           <input type="text" placeholder="Razão Social" value={novaEmpresa.razaoSocial}
             onChange={(e) => setNovaEmpresa({ ...novaEmpresa, razaoSocial: e.target.value })} />
-          
-          <h3>Endereço da Empresa (Opcional)</h3>
-          <input type="text" placeholder="Rua" value={novaEmpresa.rua}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, rua: e.target.value })} />
-          <input type="text" placeholder="Número" value={novaEmpresa.numero}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, numero: e.target.value })} />
-          <input type="text" placeholder="Bairro" value={novaEmpresa.bairro}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, bairro: e.target.value })} />
-          <input type="text" placeholder="Cidade" value={novaEmpresa.cidade}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, cidade: e.target.value })} />
-          <input type="text" placeholder="Estado (UF)" maxLength="2" value={novaEmpresa.estado}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, estado: e.target.value.toUpperCase() })} />
-          
-          <p style={{fontSize: '12px', color: '#666', marginTop: '10px'}}>
-            💡 Preencha os dados de endereço para criar empresa e endereço juntos
-          </p>
-          
+          <input type="number" placeholder="Código do Endereço" value={novaEmpresa.codEndereco}
+            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, codEndereco: e.target.value })} />
           <div className="buttonInsert">
             <button onClick={inserirEmpresa}>Salvar Empresa</button>
           </div>

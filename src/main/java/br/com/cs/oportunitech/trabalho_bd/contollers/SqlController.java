@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -13,6 +14,8 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -310,17 +313,64 @@ public class SqlController {
     // =====================================================================
 
     @PostMapping("/empresa")
-    public ResponseEntity<String> inserirEmpresa(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> inserirEmpresa(@RequestBody Map<String, Object> body) {
         try {
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+
             String sql = "INSERT INTO tb_empresa (nome, razao_social, cod_endereco) VALUES (?, ?, ?)";
+
+            jdbcTemplate.update(con -> {
+                PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                ps.setString(1, (String) body.get("nome"));
+                ps.setString(2, (String) body.get("razaoSocial"));
+                ps.setObject(3, body.get("codEndereco"));
+                return ps;
+            }, keyHolder);
+
+            Map<String, Object> keys = keyHolder.getKeys();
+
+            if (keys == null || !keys.containsKey("cod_empresa")) {
+                throw new RuntimeException("Não foi possível obter o ID da empresa.");
+            }
+
+            // CORREÇÃO: converte para Number e depois para Long/Integer
+            Number codEmpresaNumber = (Number) keys.get("cod_empresa");
+            Long codEmpresa = codEmpresaNumber.longValue(); // ou intValue()
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("mensagem", "Empresa inserida com sucesso");
+            response.put("cod_empresa", codEmpresa);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            Map<String, Object> error = new HashMap<>();
+            error.put("erro", e.getMessage());
+
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    @PutMapping("/empresa/{id}")
+    public ResponseEntity<String> atualizarEmpresa(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        try {
+            String sql = "UPDATE tb_empresa SET nome = ?, razao_social = ?, cod_endereco = ? WHERE cod_empresa = ?";
             int rows = jdbcTemplate.update(sql,
                     body.get("nome"),
                     body.get("razaoSocial"),
-                    body.get("codEndereco"));
-            return ResponseEntity.ok("✅ Empresa inserida com sucesso! Linhas afetadas: " + rows);
+                    body.get("codEndereco"),
+                    id);
+
+            if (rows > 0) {
+                return ResponseEntity.ok("✅ Empresa atualizada com sucesso! Linhas afetadas: " + rows);
+            } else {
+                return ResponseEntity.badRequest().body("❌ Empresa não encontrada");
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("❌ Erro ao inserir empresa: " + e.getMessage());
+            return ResponseEntity.badRequest().body("❌ Erro ao atualizar empresa: " + e.getMessage());
         }
     }
 
