@@ -1,4 +1,74 @@
 import React, { useEffect, useState } from 'react';
+import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react';
+
+// Componente de Notificação Toast
+const Toast = ({ message, type, onClose }) => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  const icons = {
+    success: <CheckCircle className="toast-icon" />,
+    error: <XCircle className="toast-icon" />,
+    warning: <AlertCircle className="toast-icon" />
+  };
+
+  return (
+    <div className={`toast toast-${type}`}>
+      {icons[type]}
+      <p className="toast-message">{message}</p>
+      <button onClick={onClose} className="toast-close">
+        <X className="toast-close-icon" />
+      </button>
+    </div>
+  );
+};
+
+// Container de Toasts
+const ToastContainer = ({ toasts, removeToast }) => {
+  return (
+    <div className="toast-container">
+      {toasts.map((toast) => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onClose={() => removeToast(toast.id)}
+        />
+      ))}
+    </div>
+  );
+};
+
+// Modal de Confirmação
+const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
+  return (
+    <div className="confirm-overlay">
+      <div className="confirm-dialog">
+        <div className="confirm-header">
+          <div className="confirm-icon">
+            <AlertCircle className="confirm-icon-svg" />
+          </div>
+          <div className="confirm-content">
+            <h3 className="confirm-title">Confirmar Ação</h3>
+            <p className="confirm-message">{message}</p>
+          </div>
+        </div>
+        <div className="confirm-actions">
+          <button onClick={onCancel} className="btn-cancel">
+            Cancelar
+          </button>
+          <button onClick={onConfirm} className="btn-confirm">
+            Confirmar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const JBDC = () => {
   const [tabelas, setTabelas] = useState([]);
@@ -9,6 +79,8 @@ const JBDC = () => {
   const [empresas, setEmpresas] = useState([]);
   const [funcionarios, setFuncionarios] = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
+  const [toasts, setToasts] = useState([]);
+  const [confirmDialog, setConfirmDialog] = useState(null);
 
   const API_URL = "http://localhost:8080/sql";
 
@@ -71,6 +143,32 @@ const JBDC = () => {
     supervisorId: ""
   });
 
+  // Sistema de Notificações
+  const showToast = (message, type = 'success') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, message, type }]);
+  };
+
+  const removeToast = (id) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id));
+  };
+
+  const showConfirm = (message) => {
+    return new Promise((resolve) => {
+      setConfirmDialog({
+        message,
+        onConfirm: () => {
+          setConfirmDialog(null);
+          resolve(true);
+        },
+        onCancel: () => {
+          setConfirmDialog(null);
+          resolve(false);
+        }
+      });
+    });
+  };
+
   // ===================== CARREGAR DADOS INICIAIS =====================
   useEffect(() => {
     fetch(`${API_URL}/tables`)
@@ -85,7 +183,10 @@ const JBDC = () => {
         console.log("Tabelas recebidas:", data);
         setTabelas(data);
       })
-      .catch(err => console.error("Erro ao buscar tabelas:", err));
+      .catch(err => {
+        console.error("Erro ao buscar tabelas:", err);
+        showToast("Erro ao carregar tabelas", "error");
+      });
 
     carregarCursos();
     carregarEmpresas();
@@ -100,6 +201,7 @@ const JBDC = () => {
       setCursos(data);
     } catch (err) {
       console.error("Erro ao carregar cursos:", err);
+      showToast("Erro ao carregar cursos", "error");
     }
   };
 
@@ -110,6 +212,7 @@ const JBDC = () => {
       setCursos(data);
     } catch (err) {
       console.error("Erro ao carregar Endereços:", err);
+      showToast("Erro ao carregar endereços", "error");
     }
   };
 
@@ -120,6 +223,7 @@ const JBDC = () => {
       setEmpresas(data);
     } catch (err) {
       console.error("Erro ao carregar empresas:", err);
+      showToast("Erro ao carregar empresas", "error");
     }
   };
 
@@ -134,6 +238,7 @@ const JBDC = () => {
       setFuncionarios(data);
     } catch (err) {
       console.error("Erro ao carregar funcionários:", err);
+      showToast("Erro ao carregar funcionários", "error");
     }
   };
 
@@ -144,6 +249,7 @@ const JBDC = () => {
       setDepartamentos(data);
     } catch (err) {
       console.error("Erro ao carregar departamentos:", err);
+      showToast("Erro ao carregar departamentos", "error");
     }
   };
 
@@ -174,16 +280,24 @@ const JBDC = () => {
     } catch (error) {
       console.error("Erro ao buscar dados:", error);
       setDados({ error: error.message || "Erro ao buscar dados" });
+      showToast("Erro ao buscar dados da tabela", "error");
     } finally {
       setLoading(false);
     }
   };
 
   const deletarRegistro = async (id) => {
-    if (!tabelaSelecionada) return alert("Nenhuma tabela selecionada!");
-    if (!id) return alert("ID inválido!");
+    if (!tabelaSelecionada) {
+      showToast("Nenhuma tabela selecionada!", "warning");
+      return;
+    }
+    if (!id) {
+      showToast("ID inválido!", "warning");
+      return;
+    }
 
-    if (!window.confirm("Tem certeza que deseja excluir este registro?")) return;
+    const confirmed = await showConfirm("Tem certeza que deseja excluir este registro?");
+    if (!confirmed) return;
 
     try {
       const response = await fetch(`${API_URL}/delete?table=${tabelaSelecionada}&id=${id}`, {
@@ -191,14 +305,15 @@ const JBDC = () => {
       });
 
       const result = await response.text();
-      alert(result);
 
       if (response.ok) {
+        showToast("Registro excluído com sucesso!", "success");
         carregarDados(tabelaSelecionada);
+      } else {
+        showToast(result, "error");
       }
-
     } catch (err) {
-      alert("❌ Erro ao deletar: " + err.message);
+      showToast("Erro ao deletar: " + err.message, "error");
     }
   };
 
@@ -206,7 +321,7 @@ const JBDC = () => {
   const inserirEstudante = async () => {
     try {
       if (!novoEstudante.email || !novoEstudante.primeiroNome) {
-        alert("❌ Email e Primeiro Nome são obrigatórios");
+        showToast("Email e Primeiro Nome são obrigatórios", "warning");
         return;
       }
       
@@ -226,9 +341,9 @@ const JBDC = () => {
       });
 
       const result = await response.text();
-      alert(result);
       
       if (response.ok) {
+        showToast("Estudante inserido com sucesso!", "success");
         carregarDados("tb_estudante");
         setNovoEstudante({
           primeiroNome: "",
@@ -238,9 +353,11 @@ const JBDC = () => {
           idade: "",
           codCurso: ""
         });
+      } else {
+        showToast(result, "error");
       }
     } catch (err) {
-      alert("❌ Erro ao inserir estudante: " + err.message);
+      showToast("Erro ao inserir estudante: " + err.message, "error");
     }
   };
 
@@ -248,7 +365,7 @@ const JBDC = () => {
   const inserirCurso = async () => {
     try {
       if (!novoCurso.nome) {
-        alert("❌ Nome do curso é obrigatório");
+        showToast("Nome do curso é obrigatório", "warning");
         return;
       }
       
@@ -265,9 +382,9 @@ const JBDC = () => {
       });
 
       const result = await response.text();
-      alert(result);
       
       if (response.ok) {
+        showToast("Curso inserido com sucesso!", "success");
         carregarDados("tb_curso");
         carregarCursos();
         setNovoCurso({
@@ -275,9 +392,11 @@ const JBDC = () => {
           duracao: "",
           type: "0"
         });
+      } else {
+        showToast(result, "error");
       }
     } catch (err) {
-      alert("❌ Erro ao inserir curso: " + err.message);
+      showToast("Erro ao inserir curso: " + err.message, "error");
     }
   };
 
@@ -285,11 +404,10 @@ const JBDC = () => {
   const inserirEmpresa = async () => {
     try {
       if (!novaEmpresa.nome) {
-        alert("❌ Nome da empresa é obrigatório");
+        showToast("Nome da empresa é obrigatório", "warning");
         return;
       }
       
-      // Primeiro, criar o endereço se fornecido
       let codEndereco = null;
       
       if (novaEmpresa.rua && novaEmpresa.cidade && novaEmpresa.estado) {
@@ -299,7 +417,7 @@ const JBDC = () => {
           bairro: novaEmpresa.bairro || null,
           cidade: novaEmpresa.cidade,
           estado: novaEmpresa.estado,
-          codEmpresa: null // Será atualizado depois
+          codEmpresa: null
         };
 
         const responseEndereco = await fetch(`${API_URL}/endereco`, {
@@ -310,19 +428,15 @@ const JBDC = () => {
 
         if (!responseEndereco.ok) {
           const error = await responseEndereco.text();
-          alert("❌ Erro ao criar endereço: " + error);
+          showToast("Erro ao criar endereço: " + error, "error");
           return;
         }
 
-        const resultEndereco = await responseEndereco.text();
-        // Extrair cod_endereco da resposta (assumindo que retorna algo como "Endereço inserido com sucesso! Linhas afetadas: 1")
-        // Vamos fazer uma consulta para pegar o último endereço inserido
         const enderecosResponse = await fetch(`${API_URL}/enderecos`);
         const enderecos = await enderecosResponse.json();
         codEndereco = enderecos[enderecos.length - 1].cod_endereco;
       }
       
-      // Criar a empresa com o cod_endereco
       const dadosEmpresa = {
         nome: novaEmpresa.nome,
         razaoSocial: novaEmpresa.razaoSocial || null,
@@ -337,13 +451,12 @@ const JBDC = () => {
 
       if (!responseEmpresa.ok) {
         const error = await responseEmpresa.text();
-        alert("❌ Erro ao criar empresa: " + error);
+        showToast("Erro ao criar empresa: " + error, "error");
         return;
       }
 
       const empresaCriada = await responseEmpresa.json();
       
-      // Se criou endereço, atualizar o cod_empresa no endereço
       if (codEndereco) {
         await fetch(`${API_URL}/execute`, {
           method: "POST",
@@ -354,7 +467,7 @@ const JBDC = () => {
         });
       }
 
-      alert("✅ Empresa criada com sucesso!");
+      showToast("Empresa criada com sucesso!", "success");
       
       carregarDados("tb_empresa");
       carregarEmpresas();
@@ -369,7 +482,7 @@ const JBDC = () => {
         estado: ""
       });
     } catch (err) {
-      alert("❌ Erro ao inserir empresa: " + err.message);
+      showToast("Erro ao inserir empresa: " + err.message, "error");
     }
   };
 
@@ -377,11 +490,11 @@ const JBDC = () => {
   const inserirVaga = async () => {
     try {
       if (!novaVaga.titulo) {
-        alert("❌ Título é obrigatório");
+        showToast("Título é obrigatório", "warning");
         return;
       }
       if (!novaVaga.codEmpresa) {
-        alert("❌ Selecione uma empresa");
+        showToast("Selecione uma empresa", "warning");
         return;
       }
       
@@ -390,7 +503,7 @@ const JBDC = () => {
       );
       
       if (!empresaSelecionada) {
-        alert("❌ Empresa não encontrada");
+        showToast("Empresa não encontrada", "error");
         return;
       }
       
@@ -412,9 +525,9 @@ const JBDC = () => {
       });
 
       const result = await response.text();
-      alert(result);
       
       if (response.ok) {
+        showToast("Vaga inserida com sucesso!", "success");
         carregarDados("tb_vaga");
         setNovaVaga({
           titulo: "",
@@ -425,9 +538,11 @@ const JBDC = () => {
           codEmpresa: "",
           logoLink: ""
         });
+      } else {
+        showToast(result, "error");
       }
     } catch (err) {
-      alert("❌ Erro ao inserir vaga: " + err.message);
+      showToast("Erro ao inserir vaga: " + err.message, "error");
     }
   };
 
@@ -435,15 +550,15 @@ const JBDC = () => {
   const inserirFuncionario = async () => {
     try {
       if (!novoFuncionario.primeiroNome) {
-        alert("❌ Primeiro nome é obrigatório");
+        showToast("Primeiro nome é obrigatório", "warning");
         return;
       }
       if (!novoFuncionario.email) {
-        alert("❌ Email é obrigatório");
+        showToast("Email é obrigatório", "warning");
         return;
       }
       if (!novoFuncionario.codEmpresa) {
-        alert("❌ Selecione uma empresa");
+        showToast("Selecione uma empresa", "warning");
         return;
       }
       
@@ -461,9 +576,9 @@ const JBDC = () => {
       });
 
       const result = await response.text();
-      alert(result);
       
       if (response.ok) {
+        showToast("Funcionário inserido com sucesso!", "success");
         carregarDados("tb_funcionario");
         carregarFuncionarios();
         setNovoFuncionario({
@@ -472,24 +587,26 @@ const JBDC = () => {
           email: "",
           codEmpresa: ""
         });
+      } else {
+        showToast(result, "error");
       }
     } catch (err) {
-      alert("❌ Erro ao inserir funcionário: " + err.message);
+      showToast("Erro ao inserir funcionário: " + err.message, "error");
     }
   };
 
   const inserirEndereco = async () => {
     try {
       if (!novoEndereco.rua) {
-        alert("❌ Rua é obrigatória");
+        showToast("Rua é obrigatória", "warning");
         return;
       }
       if (!novoEndereco.cidade) {
-        alert("❌ Cidade é obrigatória");
+        showToast("Cidade é obrigatória", "warning");
         return;
       }
       if (!novoEndereco.estado) {
-        alert("❌ Estado é obrigatório");
+        showToast("Estado é obrigatório", "warning");
         return;
       }
       
@@ -509,9 +626,9 @@ const JBDC = () => {
       });
 
       const result = await response.text();
-      alert(result);
       
       if (response.ok) {
+        showToast("Endereço inserido com sucesso!", "success");
         carregarDados("endereco");
         carregarEnderecos();
         setNovoEndereco({
@@ -522,9 +639,11 @@ const JBDC = () => {
           estado: "",
           codEmpresa: ""
         });
+      } else {
+        showToast(result, "error");
       }
     } catch (err) {
-      alert("❌ Erro ao inserir endereço: " + err.message);
+      showToast("Erro ao inserir endereço: " + err.message, "error");
     }
   };
 
@@ -532,7 +651,7 @@ const JBDC = () => {
   const inserirDepartamento = async () => {
     try {
       if (!novoDepartamento.nome) {
-        alert("❌ Nome do departamento é obrigatório");
+        showToast("Nome do departamento é obrigatório", "warning");
         return;
       }
       
@@ -549,9 +668,9 @@ const JBDC = () => {
       });
 
       const result = await response.text();
-      alert(result);
       
       if (response.ok) {
+        showToast("Departamento inserido com sucesso!", "success");
         carregarDados("tb_departamento");
         carregarDepartamentos();
         setNovoDepartamento({
@@ -559,9 +678,11 @@ const JBDC = () => {
           codFuncionario: "",
           supervisorId: ""
         });
+      } else {
+        showToast(result, "error");
       }
     } catch (err) {
-      alert("❌ Erro ao inserir departamento: " + err.message);
+      showToast("Erro ao inserir departamento: " + err.message, "error");
     }
   };
 
@@ -571,7 +692,7 @@ const JBDC = () => {
 
     if (dados.error) {
       return (
-        <div className="error-message">
+        <div className="error-box">
           <h3>Erro:</h3>
           <p>{dados.error}</p>
         </div>
@@ -580,8 +701,8 @@ const JBDC = () => {
 
     if (Array.isArray(dados) && dados.length > 0) {
       return (
-        <div className="query-results">
-          <table className="results-table">
+        <div className="table-wrapper">
+          <table className="data-table">
             <thead>
               <tr>
                 {Object.keys(dados[0]).map(key => (
@@ -595,11 +716,16 @@ const JBDC = () => {
                 <tr key={index}>
                   {Object.values(row).map((value, cellIndex) => (
                     <td key={cellIndex}>
-                      {value !== null ? value.toString() : 'NULL'}
+                      {value !== null ? value.toString() : <span className="null-value">NULL</span>}
                     </td>
                   ))}
-                  <td onClick={() => deletarRegistro(row[Object.keys(row)[0]])}>
-                    <i className="fa-solid fa-trash" style={{ cursor: "pointer", color: "red" }}></i>
+                  <td>
+                    <button
+                      onClick={() => deletarRegistro(row[Object.keys(row)[0]])}
+                      className="btn-delete"
+                    >
+                      <XCircle className="icon-delete" />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -611,7 +737,7 @@ const JBDC = () => {
 
     if (Array.isArray(dados) && dados.length === 0) {
       return (
-        <div className="success-message">
+        <div className="info-box">
           <p>Consulta executada com sucesso, mas nenhum resultado foi retornado.</p>
         </div>
       );
@@ -619,9 +745,12 @@ const JBDC = () => {
   };
 
   return (
-    <div>
-      <div className="jbdcCabecalho">
-        <div className="selectContainer">
+    <div className="jbdc-container">
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
+      {confirmDialog && <ConfirmDialog {...confirmDialog} />}
+
+      <div className="jbdc-content">
+        <div className="jbdc-header">
           <h1>Escolha uma Tabela</h1>
           <select
             value={tabelaSelecionada}
@@ -631,6 +760,7 @@ const JBDC = () => {
               carregarDados(value);
             }}
             disabled={loading}
+            className="table-select"
           >
             <option value="">Selecione...</option>
             {tabelas.map((t, i) => {
@@ -644,215 +774,369 @@ const JBDC = () => {
             })}
           </select>
         </div>
-      </div>
 
-      {/* ===================== ESTUDANTE ===================== */}
-      {tabelaSelecionada === "tb_estudante" && (
-        <div className='tabelasInsert'>
-          <h2>Inserir Novo Estudante</h2>
-          <input type="email" placeholder="Email" value={novoEstudante.email}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, email: e.target.value })} />
-          <input type="number" placeholder="Idade" value={novoEstudante.idade}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, idade: e.target.value })} />
-          <input type="text" placeholder="Primeiro Nome" value={novoEstudante.primeiroNome}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, primeiroNome: e.target.value })} />
-          <input type="text" placeholder="Segundo Nome" value={novoEstudante.segundoNome}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, segundoNome: e.target.value })} />
-          <input type="text" placeholder="Telefone" value={novoEstudante.telefone}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, telefone: e.target.value })} />
-          <select value={novoEstudante.codCurso}
-            onChange={(e) => setNovoEstudante({ ...novoEstudante, codCurso: e.target.value })}>
-            <option value="">Selecione um Curso</option>
-            {cursos.map((curso) => (
-              <option key={curso.cod_curso} value={curso.cod_curso}>
-                {curso.nome}
-              </option>
-            ))}
-          </select>
-          <div className="buttonInsert">
-            <button onClick={inserirEstudante}>Salvar Estudante</button>
+        {/* ===================== ESTUDANTE ===================== */}
+        {tabelaSelecionada === "tb_estudante" && (
+          <div className="form-card">
+            <h2>Inserir Novo Estudante</h2>
+            <div className="form-grid">
+              <input
+                type="email"
+                placeholder="Email"
+                value={novoEstudante.email}
+                onChange={(e) => setNovoEstudante({ ...novoEstudante, email: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="number"
+                placeholder="Idade"
+                value={novoEstudante.idade}
+                onChange={(e) => setNovoEstudante({ ...novoEstudante, idade: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="text"
+                placeholder="Primeiro Nome"
+                value={novoEstudante.primeiroNome}
+                onChange={(e) => setNovoEstudante({ ...novoEstudante, primeiroNome: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="text"
+                placeholder="Segundo Nome"
+                value={novoEstudante.segundoNome}
+                onChange={(e) => setNovoEstudante({ ...novoEstudante, segundoNome: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="text"
+                placeholder="Telefone"
+                value={novoEstudante.telefone}
+                onChange={(e) => setNovoEstudante({ ...novoEstudante, telefone: e.target.value })}
+                className="form-input"
+              />
+              <select
+                value={novoEstudante.codCurso}
+                onChange={(e) => setNovoEstudante({ ...novoEstudante, codCurso: e.target.value })}
+                className="form-input"
+              >
+                <option value="">Selecione um Curso</option>
+                {cursos.map((curso) => (
+                  <option key={curso.cod_curso} value={curso.cod_curso}>
+                    {curso.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button onClick={inserirEstudante} className="btn-primary">
+              Salvar Estudante
+            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ===================== CURSO ===================== */}
-      {tabelaSelecionada === "tb_curso" && (
-        <div className='tabelasInsert'>
-          <h2>Inserir Novo Curso</h2>
-          <input type="number" placeholder="Duração (Horas)" value={novoCurso.duracao}
-            onChange={(e) => setNovoCurso({ ...novoCurso, duracao: e.target.value })} />
-          <input type="text" placeholder="Nome do Curso" value={novoCurso.nome}
-            onChange={(e) => setNovoCurso({ ...novoCurso, nome: e.target.value })} />
-          <select value={novoCurso.type}
-            onChange={(e) => setNovoCurso({ ...novoCurso, type: e.target.value })}>
-            <option value="0">Graduação</option>
-            <option value="1">Pós-Graduação</option>
-            <option value="2">Técnico</option>
-          </select>
-          <div className="buttonInsert">
-            <button onClick={inserirCurso}>Salvar Curso</button>
+        {/* ===================== CURSO ===================== */}
+        {tabelaSelecionada === "tb_curso" && (
+          <div className="form-card">
+            <h2>Inserir Novo Curso</h2>
+            <div className="form-grid">
+              <input
+                type="number"
+                placeholder="Duração (Horas)"
+                value={novoCurso.duracao}
+                onChange={(e) => setNovoCurso({ ...novoCurso, duracao: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="text"
+                placeholder="Nome do Curso"
+                value={novoCurso.nome}
+                onChange={(e) => setNovoCurso({ ...novoCurso, nome: e.target.value })}
+                className="form-input"
+              />
+              <select
+                value={novoCurso.type}
+                onChange={(e) => setNovoCurso({ ...novoCurso, type: e.target.value })}
+                className="form-input"
+              >
+                <option value="0">Graduação</option>
+                <option value="1">Pós-Graduação</option>
+                <option value="2">Técnico</option>
+              </select>
+            </div>
+            <button onClick={inserirCurso} className="btn-primary">
+              Salvar Curso
+            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ===================== EMPRESA ===================== */}
-      {tabelaSelecionada === "tb_empresa" && (
-        <div className='tabelasInsert'>
-          <h2>Inserir Nova Empresa</h2>
-          <input type="text" placeholder="Nome" value={novaEmpresa.nome}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, nome: e.target.value })} />
-          <input type="text" placeholder="Razão Social" value={novaEmpresa.razaoSocial}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, razaoSocial: e.target.value })} />
-          <input type="number" placeholder="Código do Endereço" value={novaEmpresa.codEndereco}
-            onChange={(e) => setNovaEmpresa({ ...novaEmpresa, codEndereco: e.target.value })} />
-          <div className="buttonInsert">
-            <button onClick={inserirEmpresa}>Salvar Empresa</button>
+        {/* ===================== EMPRESA ===================== */}
+        {tabelaSelecionada === "tb_empresa" && (
+          <div className="form-card">
+            <h2>Inserir Nova Empresa</h2>
+            <div className="form-grid">
+              <input
+                type="text"
+                placeholder="Nome"
+                value={novaEmpresa.nome}
+                onChange={(e) => setNovaEmpresa({ ...novaEmpresa, nome: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="text"
+                placeholder="Razão Social"
+                value={novaEmpresa.razaoSocial}
+                onChange={(e) => setNovaEmpresa({ ...novaEmpresa, razaoSocial: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="number"
+                placeholder="Código do Endereço"
+                value={novaEmpresa.codEndereco}
+                onChange={(e) => setNovaEmpresa({ ...novaEmpresa, codEndereco: e.target.value })}
+                className="form-input"
+              />
+            </div>
+            <button onClick={inserirEmpresa} className="btn-primary">
+              Salvar Empresa
+            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ===================== VAGA ===================== */}
-      {tabelaSelecionada === "tb_vaga" && (
-        <div className='tabelasInsert'>
-          <h2>Inserir Nova Vaga</h2>
-          <input type="text" placeholder="Título" value={novaVaga.titulo}
-            onChange={(e) => setNovaVaga({ ...novaVaga, titulo: e.target.value })} />
-          <textarea placeholder="Descrição" value={novaVaga.descricao}
-            onChange={(e) => setNovaVaga({ ...novaVaga, descricao: e.target.value })} rows="3" />
-          <input type="number" placeholder="Carga Horária" value={novaVaga.cargaHoraria}
-            onChange={(e) => setNovaVaga({ ...novaVaga, cargaHoraria: e.target.value })} />
-          <select value={novaVaga.modalidades}
-            onChange={(e) => setNovaVaga({ ...novaVaga, modalidades: e.target.value })}>
-            <option value="0">Presencial</option>
-            <option value="1">Remoto</option>
-            <option value="2">Híbrido</option>
-          </select>
-          <input type="number" step="0.01" placeholder="Salário" value={novaVaga.salario}
-            onChange={(e) => setNovaVaga({ ...novaVaga, salario: e.target.value })} />
-          <select value={novaVaga.codEmpresa}
-            onChange={(e) => setNovaVaga({ ...novaVaga, codEmpresa: e.target.value })}>
-            <option value="">Selecione uma Empresa</option>
-            {empresas.map((empresa) => (
-              <option key={empresa.cod_empresa} value={empresa.cod_empresa}>
-                {empresa.nome}
-              </option>
-            ))}
-          </select>
-          <input type="text" placeholder="Link do Logo (URL)" value={novaVaga.logoLink}
-            onChange={(e) => setNovaVaga({ ...novaVaga, logoLink: e.target.value })} />
-          <div className="buttonInsert">
-            <button onClick={inserirVaga}>Salvar Vaga</button>
+        {/* ===================== VAGA ===================== */}
+        {tabelaSelecionada === "tb_vaga" && (
+          <div className="form-card">
+            <h2>Inserir Nova Vaga</h2>
+            <div className="form-grid">
+              <input
+                type="text"
+                placeholder="Título"
+                value={novaVaga.titulo}
+                onChange={(e) => setNovaVaga({ ...novaVaga, titulo: e.target.value })}
+                className="form-input"
+              />
+              <textarea
+                placeholder="Descrição"
+                value={novaVaga.descricao}
+                onChange={(e) => setNovaVaga({ ...novaVaga, descricao: e.target.value })}
+                rows="3"
+                className="form-input"
+              />
+              <input
+                type="number"
+                placeholder="Carga Horária"
+                value={novaVaga.cargaHoraria}
+                onChange={(e) => setNovaVaga({ ...novaVaga, cargaHoraria: e.target.value })}
+                className="form-input"
+              />
+              <select
+                value={novaVaga.modalidades}
+                onChange={(e) => setNovaVaga({ ...novaVaga, modalidades: e.target.value })}
+                className="form-input"
+              >
+                <option value="0">Presencial</option>
+                <option value="1">Remoto</option>
+                <option value="2">Híbrido</option>
+              </select>
+              <input
+                type="number"
+                step="0.01"
+                placeholder="Salário"
+                value={novaVaga.salario}
+                onChange={(e) => setNovaVaga({ ...novaVaga, salario: e.target.value })}
+                className="form-input"
+              />
+              <select
+                value={novaVaga.codEmpresa}
+                onChange={(e) => setNovaVaga({ ...novaVaga, codEmpresa: e.target.value })}
+                className="form-input"
+              >
+                <option value="">Selecione uma Empresa</option>
+                {empresas.map((empresa) => (
+                  <option key={empresa.cod_empresa} value={empresa.cod_empresa}>
+                    {empresa.nome}
+                  </option>
+                ))}
+              </select>
+              <input
+                type="text"
+                placeholder="Link do Logo (URL)"
+                value={novaVaga.logoLink}
+                onChange={(e) => setNovaVaga({ ...novaVaga, logoLink: e.target.value })}
+                className="form-input"
+              />
+            </div>
+            <button onClick={inserirVaga} className="btn-primary">
+              Salvar Vaga
+            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ===================== FUNCIONÁRIO ===================== */}
-      {tabelaSelecionada === "tb_funcionario" && (
-        <div className='tabelasInsert'>
-          <h2>Inserir Novo Funcionário</h2>
-          <input type="text" placeholder="Primeiro Nome" value={novoFuncionario.primeiroNome}
-            onChange={(e) => setNovoFuncionario({ ...novoFuncionario, primeiroNome: e.target.value })} />
-          <input type="text" placeholder="Segundo Nome" value={novoFuncionario.segundoNome}
-            onChange={(e) => setNovoFuncionario({ ...novoFuncionario, segundoNome: e.target.value })} />
-          <input type="email" placeholder="Email" value={novoFuncionario.email}
-            onChange={(e) => setNovoFuncionario({ ...novoFuncionario, email: e.target.value })} />
-          <select value={novoFuncionario.cargo}
-            onChange={(e) => setNovoFuncionario({ ...novoFuncionario, cargo: e.target.value })}>
-            <option value="0">Gerente</option>
-            <option value="1">Comum</option>
-          </select>
-          <select value={novoFuncionario.codEmpresa}
-            onChange={(e) => setNovoFuncionario({ ...novoFuncionario, codEmpresa: e.target.value })}>
-            <option value="">Selecione uma Empresa</option>
-            {empresas.map((empresa) => (
-              <option key={empresa.cod_empresa} value={empresa.cod_empresa}>
-                {empresa.nome}
-              </option>
-            ))}
-          </select>
-          <div className="buttonInsert">
-            <button onClick={inserirFuncionario}>Salvar Funcionário</button>
+        {/* ===================== FUNCIONÁRIO ===================== */}
+        {tabelaSelecionada === "tb_funcionario" && (
+          <div className="form-card">
+            <h2>Inserir Novo Funcionário</h2>
+            <div className="form-grid">
+              <input
+                type="text"
+                placeholder="Primeiro Nome"
+                value={novoFuncionario.primeiroNome}
+                onChange={(e) => setNovoFuncionario({ ...novoFuncionario, primeiroNome: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="text"
+                placeholder="Segundo Nome"
+                value={novoFuncionario.segundoNome}
+                onChange={(e) => setNovoFuncionario({ ...novoFuncionario, segundoNome: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                value={novoFuncionario.email}
+                onChange={(e) => setNovoFuncionario({ ...novoFuncionario, email: e.target.value })}
+                className="form-input"
+              />
+              <select
+                value={novoFuncionario.cargo}
+                onChange={(e) => setNovoFuncionario({ ...novoFuncionario, cargo: e.target.value })}
+                className="form-input"
+              >
+                <option value="0">Gerente</option>
+                <option value="1">Comum</option>
+              </select>
+              <select
+                value={novoFuncionario.codEmpresa}
+                onChange={(e) => setNovoFuncionario({ ...novoFuncionario, codEmpresa: e.target.value })}
+                className="form-input"
+              >
+                <option value="">Selecione uma Empresa</option>
+                {empresas.map((empresa) => (
+                  <option key={empresa.cod_empresa} value={empresa.cod_empresa}>
+                    {empresa.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button onClick={inserirFuncionario} className="btn-primary">
+              Salvar Funcionário
+            </button>
           </div>
-        </div>
-      )}
-      {/* ===================== ENDEREÇO ===================== */}
-      {tabelaSelecionada === "endereco" && (
-        <div className='tabelasInsert'>
-          <h2>Inserir Novo Endereço</h2>
-          <input type="text" placeholder="Rua *" value={novoEndereco.rua}
-            onChange={(e) => setNovoEndereco({ ...novoEndereco, rua: e.target.value })} />
-          <input type="text" placeholder="Número" value={novoEndereco.numero}
-            onChange={(e) => setNovoEndereco({ ...novoEndereco, numero: e.target.value })} />
-          <input type="text" placeholder="Bairro" value={novoEndereco.bairro}
-            onChange={(e) => setNovoEndereco({ ...novoEndereco, bairro: e.target.value })} />
-          <input type="text" placeholder="Cidade *" value={novoEndereco.cidade}
-            onChange={(e) => setNovoEndereco({ ...novoEndereco, cidade: e.target.value })} />
-          <input type="text" placeholder="Estado (UF) *" maxLength="2" value={novoEndereco.estado}
-            onChange={(e) => setNovoEndereco({ ...novoEndereco, estado: e.target.value.toUpperCase() })} />
-          <select value={novoEndereco.codEmpresa}
-            onChange={(e) => setNovoEndereco({ ...novoEndereco, codEmpresa: e.target.value })}>
-            <option value="">Selecione uma Empresa (Opcional)</option>
-            {empresas.map((empresa) => (
-              <option key={empresa.cod_empresa} value={empresa.cod_empresa}>
-                {empresa.nome}
-              </option>
-            ))}
-          </select>
-          <div className="buttonInsert">
-            <button onClick={inserirEndereco}>Salvar Endereço</button>
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* ===================== DEPARTAMENTO ===================== */}
-      {tabelaSelecionada === "tb_departamento" && (
-        <div className='tabelasInsert'>
-          <h2>Inserir Novo Departamento</h2>
-          <input 
-            type="text" 
-            placeholder="Nome do Departamento *" 
-            value={novoDepartamento.nome}
-            onChange={(e) => setNovoDepartamento({ ...novoDepartamento, nome: e.target.value })} 
-          />
-          
-         <select 
-          value={novoDepartamento.codFuncionario}
-          onChange={(e) => setNovoDepartamento({ ...novoDepartamento, codFuncionario: e.target.value })}>
-          <option value="">Selecione um Funcionário Responsável (Opcional)</option>
-          {funcionarios.map((func) => (
-            func.cargo === 1 && (
-              <option key={func.cod_funcionario} value={func.cod_funcionario}>
-                {func.primeiro_nome} {func.segundo_nome} - {func.email}
-              </option>
-            )
-          ))}
-        </select>
-          
-          <select 
-            value={novoDepartamento.supervisorId}
-            onChange={(e) => setNovoDepartamento({ ...novoDepartamento, supervisorId: e.target.value })}>
-            <option value="">Selecione um Departamento Supervisor (Opcional)</option>
-            {departamentos.map((dept) => (
-              <option key={dept.cod_dep} value={dept.cod_dep}>
-                {dept.nome}
-              </option>
-            ))}
-          </select>
-          
-          <p style={{fontSize: '12px', color: '#666', marginTop: '10px'}}>
-            💡 O departamento supervisor cria uma hierarquia entre departamentos
-          </p>
-          
-          <div className="buttonInsert">
-            <button onClick={inserirDepartamento}>Salvar Departamento</button>
+        {/* ===================== ENDEREÇO ===================== */}
+        {tabelaSelecionada === "endereco" && (
+          <div className="form-card">
+            <h2>Inserir Novo Endereço</h2>
+            <div className="form-grid">
+              <input
+                type="text"
+                placeholder="Rua *"
+                value={novoEndereco.rua}
+                onChange={(e) => setNovoEndereco({ ...novoEndereco, rua: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="text"
+                placeholder="Número"
+                value={novoEndereco.numero}
+                onChange={(e) => setNovoEndereco({ ...novoEndereco, numero: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="text"
+                placeholder="Bairro"
+                value={novoEndereco.bairro}
+                onChange={(e) => setNovoEndereco({ ...novoEndereco, bairro: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="text"
+                placeholder="Cidade *"
+                value={novoEndereco.cidade}
+                onChange={(e) => setNovoEndereco({ ...novoEndereco, cidade: e.target.value })}
+                className="form-input"
+              />
+              <input
+                type="text"
+                placeholder="Estado (UF) *"
+                maxLength="2"
+                value={novoEndereco.estado}
+                onChange={(e) => setNovoEndereco({ ...novoEndereco, estado: e.target.value.toUpperCase() })}
+                className="form-input"
+              />
+              <select
+                value={novoEndereco.codEmpresa}
+                onChange={(e) => setNovoEndereco({ ...novoEndereco, codEmpresa: e.target.value })}
+                className="form-input"
+              >
+                <option value="">Selecione uma Empresa (Opcional)</option>
+                {empresas.map((empresa) => (
+                  <option key={empresa.cod_empresa} value={empresa.cod_empresa}>
+                    {empresa.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button onClick={inserirEndereco} className="btn-primary">
+              Salvar Endereço
+            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ===================== TABELA ATUALIZADA ===================== */}
-      <div className="tablesSql">
-        <h1>Tabela Atualizada</h1>
-        {renderResult()}
+        {/* ===================== DEPARTAMENTO ===================== */}
+        {tabelaSelecionada === "tb_departamento" && (
+          <div className="form-card">
+            <h2>Inserir Novo Departamento</h2>
+            <div className="form-grid">
+              <input
+                type="text"
+                placeholder="Nome do Departamento *"
+                value={novoDepartamento.nome}
+                onChange={(e) => setNovoDepartamento({ ...novoDepartamento, nome: e.target.value })}
+                className="form-input"
+              />
+              <select
+                value={novoDepartamento.codFuncionario}
+                onChange={(e) => setNovoDepartamento({ ...novoDepartamento, codFuncionario: e.target.value })}
+                className="form-input"
+              >
+                <option value="">Selecione um Funcionário Responsável (Opcional)</option>
+                {funcionarios.map((func) => (
+                  func.cargo === 1 && (
+                    <option key={func.cod_funcionario} value={func.cod_funcionario}>
+                      {func.primeiro_nome} {func.segundo_nome} - {func.email}
+                    </option>
+                  )
+                ))}
+              </select>
+              <select
+                value={novoDepartamento.supervisorId}
+                onChange={(e) => setNovoDepartamento({ ...novoDepartamento, supervisorId: e.target.value })}
+                className="form-input"
+              >
+                <option value="">Selecione um Departamento Supervisor (Opcional)</option>
+                {departamentos.map((dept) => (
+                  <option key={dept.cod_dep} value={dept.cod_dep}>
+                    {dept.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="form-hint">
+              💡 O departamento supervisor cria uma hierarquia entre departamentos
+            </p>
+            <button onClick={inserirDepartamento} className="btn-primary">
+              Salvar Departamento
+            </button>
+          </div>
+        )}
+
+        {/* ===================== TABELA ATUALIZADA ===================== */}
+        <div className="results-section">
+          <h1>Tabela Atualizada</h1>
+          {renderResult()}
+        </div>
       </div>
     </div>
   );

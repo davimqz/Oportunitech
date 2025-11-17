@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { AlertCircle, Loader } from 'lucide-react';
 
 const API_URL = "http://localhost:8080/sql";
 
@@ -57,17 +58,25 @@ const Visualizar = () => {
 
     if (dados.error) {
       return (
-        <div className="error-message">
-          <h3>Erro:</h3>
-          <p>{dados.error}</p>
+        <div className="error-box">
+          <div className="error-icon">
+            <AlertCircle className="error-icon-svg" />
+          </div>
+          <div>
+            <h3>Erro ao carregar dados</h3>
+            <p>{dados.error}</p>
+          </div>
         </div>
       );
     }
 
     if (Array.isArray(dados) && dados.length > 0) {
       return (
-        <div className="query-results">
-          <table className="results-table">
+        <div className="table-wrapper">
+          <div className="table-info">
+            <span className="table-count">{dados.length} registro(s) encontrado(s)</span>
+          </div>
+          <table className="data-table">
             <thead>
               <tr>
                 {Object.keys(dados[0]).map(key => (
@@ -80,7 +89,7 @@ const Visualizar = () => {
                 <tr key={index}>
                   {Object.values(row).map((value, cellIndex) => (
                     <td key={cellIndex}>
-                      {value !== null ? value.toString() : 'NULL'}
+                      {value !== null ? value.toString() : <span className="null-value">NULL</span>}
                     </td>
                   ))}
                 </tr>
@@ -93,7 +102,7 @@ const Visualizar = () => {
 
     if (Array.isArray(dados) && dados.length === 0) {
       return (
-        <div className="success-message">
+        <div className="info-box">
           <p>Consulta executada com sucesso, mas nenhum resultado foi retornado.</p>
         </div>
       );
@@ -107,41 +116,57 @@ const Visualizar = () => {
   };
 
   return (
-    <div>
-      <div className="visualizarContainer">
-        <div className="visualizarBox">
-          {/* Select com todas as tabelas */}
-          <div className="selectContainer">
-            <h1>Escolha uma Tabela para visualizar os dados</h1>
-            <select
-              value={tabelaSelecionada}
-              onChange={(e) => {
-                const value = e.target.value;
-                setTabelaSelecionada(value);
-                carregarDados(value);
-              }}
-              disabled={loading}
-            >
-              <option value="">Selecione...</option>
-              {tabelas.map((t, i) => {
-                const nomeTabela = typeof t === "string" ? t : Object.values(t)[0];
-                return <option key={i} value={nomeTabela}>{nomeTabela}</option>;
-              })}
-
-
-            </select>
-          </div>
-
-          {/* Exibir resultado igual à Home */}
-          <div className="visualizarTabelaContainer">
-            <div className="visualizarTabelaBox">
-              {loading ? <p>Carregando...</p> : renderResult()}
-            </div>
-          </div>
+    <div className="visualizar-container">
+      <div className="visualizar-content">
+        <div className="visualizar-header">
+          <h1>Visualizar Dados das Tabelas</h1>
+          <p className="visualizar-subtitle">Selecione uma tabela para visualizar seus registros</p>
         </div>
+
+        <div className="select-card">
+          <label htmlFor="table-select" className="select-label">
+            Tabela
+          </label>
+          <select
+            id="table-select"
+            value={tabelaSelecionada}
+            onChange={(e) => {
+              const value = e.target.value;
+              setTabelaSelecionada(value);
+              carregarDados(value);
+            }}
+            disabled={loading}
+            className="table-select"
+          >
+            <option value="">Selecione uma tabela...</option>
+            {tabelas.map((t, i) => {
+              const nomeTabela = typeof t === "string" ? t : Object.values(t)[0];
+              return <option key={i} value={nomeTabela}>{nomeTabela}</option>;
+            })}
+          </select>
+        </div>
+
+        {loading ? (
+          <div className="loading-container">
+            <Loader className="loading-spinner" />
+            <p>Carregando dados...</p>
+          </div>
+        ) : (
+          <div className="results-card">
+            {dados ? renderResult() : (
+              <div className="empty-state">
+                <svg className="empty-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <h3>Nenhuma tabela selecionada</h3>
+                <p>Escolha uma tabela acima para visualizar seus dados</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Visualizar;
