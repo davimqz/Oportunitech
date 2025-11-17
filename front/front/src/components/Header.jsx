@@ -13,11 +13,12 @@ const Header = () => {
       <header className="header">
         <div className="header-container">
           <div className="header-content">
-            <div>
-              <a href="#" className="logo">OportuniTech</a>
-            </div>
+           
 
             <nav className="nav-desktop">
+              <div className='logoHeader'>
+                <img src="https://res.cloudinary.com/dthgw4q5d/image/upload/v1763412984/Imagem_do_WhatsApp_de_2025-11-17_%C3%A0_s_17.55.06_3c978339_gosico.jpg" alt="" />
+              </div>
               <div className="headerOption">
                 <i class="fa-solid fa-house"></i>
                 <a href="/" className="nav-link">Início</a>

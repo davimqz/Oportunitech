@@ -251,16 +251,7 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="dashboard-content">
-        {/* Header */}
-        <div className="dashboard-header">
-          <h1 className="dashboard-title">
-            Dashboard
-          </h1>
-          <p className="dashboard-subtitle">
-            Análise completa dos dados do banco de dados com insights estatísticos
-          </p>
-        </div>
-
+    
         {/* Filtros */}
         <div className="filtros-container">
           <button onClick={() => setMostrarFiltros(!mostrarFiltros)} className="filtros-toggle">
