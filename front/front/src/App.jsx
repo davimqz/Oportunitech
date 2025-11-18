@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Sql from './pages/Sql';
 import Vagas from './pages/Vagas';
 import Dashboard from './pages/Dashboard';
+import Update from './pages/Update';
 
 const App = () => {
 

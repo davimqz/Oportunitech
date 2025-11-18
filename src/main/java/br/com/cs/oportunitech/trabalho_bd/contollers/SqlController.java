@@ -51,44 +51,59 @@ public class SqlController {
      * Suporta stored procedures, functions e triggers
      */
     @PostMapping("/execute")
-    public ResponseEntity<?> executeSql(@RequestBody Map<String, String> body) {
-        String sql = body.get("sql");
-        if (sql == null || sql.isBlank()) {
-            return ResponseEntity.badRequest().body("❌ Nenhum SQL informado.");
+    public ResponseEntity<?> executeSql(@RequestBody Map<String, String> request) {
+        String sql = request.get("sql");
+        
+        if (sql == null || sql.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("SQL vazio.");
         }
 
-        try {
-            String sqlClean = sql.trim();
-            String sqlLower = sqlClean.toLowerCase();
+        String cleanSql = sql.trim().toLowerCase();
 
-            // Verificar se é uma consulta (SELECT, SHOW, DESCRIBE, EXPLAIN)
-            if (isQueryCommand(sqlLower)) {
-                List<Map<String, Object>> result = jdbcTemplate.queryForList(sqlClean);
+        try {
+            // 1. Comandos que não retornam ResultSet
+            if (
+                cleanSql.startsWith("create") || 
+                cleanSql.startsWith("alter") ||
+                cleanSql.startsWith("drop") ||
+                cleanSql.startsWith("grant") ||
+                cleanSql.startsWith("revoke") ||
+                cleanSql.startsWith("truncate") ||
+                cleanSql.startsWith("insert") ||
+                cleanSql.startsWith("update") ||
+                cleanSql.startsWith("delete")
+            ) {
+                jdbcTemplate.update(sql);
+                return ResponseEntity.ok("Comando executado com sucesso.");
+            }
+
+            // 2. Blocos/Procedures/Triggers via DO $$
+            if (cleanSql.startsWith("do ") || cleanSql.contains("$$")) {
+                jdbcTemplate.execute(sql);
+                return ResponseEntity.ok("Bloco DO executado com sucesso.");
+            }
+
+            // 3. CALL procedure()
+            if (cleanSql.startsWith("call")) {
+                jdbcTemplate.update(sql);
+                return ResponseEntity.ok("Procedure executada com sucesso.");
+            }
+
+            // 4. SELECT de funções
+            if (cleanSql.startsWith("select")) {
+                List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
                 return ResponseEntity.ok(result);
             }
 
-            // Verificar se é criação de stored routine
-            if (isStoredRoutineCreation(sqlLower)) {
-                return executeStoredRoutineCreation(sqlClean);
-            }
+            // 5. Execuções desconhecidas → tenta update
+            jdbcTemplate.update(sql);
+            return ResponseEntity.ok("Comando executado.");
 
-            // Verificar se contém DELIMITER
-            if (sqlLower.contains("delimiter")) {
-                return executeWithDelimiter(sqlClean);
-            }
-
-            // Executar comando de modificação (INSERT, UPDATE, DELETE)
-            int updated = jdbcTemplate.update(sqlClean);
-            return ResponseEntity.ok("✅ Operação executada com sucesso. Linhas afetadas: " + updated);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("❌ Erro SQL: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("❌ Erro ao executar: " + e.getMessage());
+            return ResponseEntity.status(400).body("Erro ao executar SQL: " + e.getMessage());
         }
     }
+
 
     /**
      * Lista todas as tabelas do banco de dados
@@ -383,6 +398,64 @@ public class SqlController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    // =====================================================================
+    // CRUD - ENTREVISTA
+    // =====================================================================
+
+    @PostMapping("/entrevista")
+    public ResponseEntity<String> inserirEntrevista(@RequestBody Map<String, Object> body) {
+        try {
+            if (body.get("codEstudante") == null)
+                return ResponseEntity.badRequest().body("❌ Código do estudante é obrigatório");
+
+            if (body.get("codVaga") == null)
+                return ResponseEntity.badRequest().body("❌ Código da vaga é obrigatório");
+
+            if (body.get("data") == null)
+                return ResponseEntity.badRequest().body("❌ Data é obrigatória");
+
+            Long codEstudante = Long.valueOf(body.get("codEstudante").toString());
+            Long codVaga = Long.valueOf(body.get("codVaga").toString());
+            String dataStr = body.get("data").toString(); // YYYY-MM-DD
+
+            String sql = "INSERT INTO tb_entrevista (cod_estudante, cod_vaga, data) " +
+                        "VALUES (?, ?, CAST(? AS DATE))";
+
+            jdbcTemplate.update(sql, codEstudante, codVaga, dataStr);
+
+            return ResponseEntity.ok("✅ Entrevista inserida com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("❌ Erro ao inserir entrevista: " + e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/entrevistas")
+    public ResponseEntity<List<Map<String, Object>>> listarEntrevistas() {
+        try {
+            String sql = "SELECT * FROM tb_entrevista";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/entrevista/{id}")
+    public ResponseEntity<?> buscarEntrevistaPorId(@PathVariable Long id) {
+        try {
+            String sql = "SELECT * FROM tb_entrevista WHERE cod_entrevista = ?";
+            Map<String, Object> result = jdbcTemplate.queryForMap(sql, id);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("❌ Erro ao buscar entrevista: " + e.getMessage());
         }
     }
 
@@ -792,6 +865,7 @@ public class SqlController {
             case "tb_funcionario" -> "cod_funcionario";
             case "tb_departamento" -> "cod_dep";
             case "endereco" -> "cod_endereco";
+            case "tb_entrevista" -> "num_entrevista";
             default -> "id";
         };
     }

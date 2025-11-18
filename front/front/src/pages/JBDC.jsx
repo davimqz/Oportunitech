@@ -76,11 +76,14 @@ const JBDC = () => {
   const [dados, setDados] = useState(null);
   const [loading, setLoading] = useState(false);
   const [cursos, setCursos] = useState([]);
+  const [vagas, setVagas] = useState([]);
   const [empresas, setEmpresas] = useState([]);
   const [funcionarios, setFuncionarios] = useState([]);
   const [departamentos, setDepartamentos] = useState([]);
   const [toasts, setToasts] = useState([]);
   const [confirmDialog, setConfirmDialog] = useState(null);
+  const [estudantes, setEstudantes] = useState([]);
+
 
   const API_URL = "http://localhost:8080/sql";
 
@@ -143,6 +146,13 @@ const JBDC = () => {
     supervisorId: ""
   });
 
+  const [novaEntrevista, setNovaEntrevista] = useState({
+    codEstudante: "",
+    codVaga: "",
+    data: "",
+  });
+
+
   // Sistema de Notificações
   const showToast = (message, type = 'success') => {
     const id = Date.now();
@@ -192,6 +202,8 @@ const JBDC = () => {
     carregarEmpresas();
     carregarFuncionarios();
     carregarDepartamentos();
+    carregarEstudantes();
+    carregarVagas();
   }, []);
 
   const carregarCursos = async () => {
@@ -202,6 +214,35 @@ const JBDC = () => {
     } catch (err) {
       console.error("Erro ao carregar cursos:", err);
       showToast("Erro ao carregar cursos", "error");
+    }
+  };
+
+  const carregarVagas = async () => {
+    try {
+      const res = await fetch(`${API_URL}/execute`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sql: "SELECT * FROM tb_vaga" })
+      });
+      const data = await res.json();
+      setVagas(data);
+    } catch {
+      showToast("Erro ao carregar vagas", "error");
+    }
+  };
+
+
+  const carregarEstudantes = async () => {
+    try {
+      const res = await fetch(`${API_URL}/execute`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sql: "SELECT * FROM tb_estudante" })
+    });
+      const data = await res.json();
+      setEstudantes(data);
+    } catch {
+      showToast("Erro ao carregar estudantes", "error");
     }
   };
 
@@ -686,6 +727,46 @@ const JBDC = () => {
     }
   };
 
+  const inserirEntrevista = async () => {
+    try {
+      if (!novaEntrevista.codEstudante || !novaEntrevista.codVaga || !novaEntrevista.data) {
+        showToast("Preencha estudante, vaga e data", "warning");
+        return;
+      }
+
+      const dados = {
+        codEstudante: parseInt(novaEntrevista.codEstudante),
+        codVaga: parseInt(novaEntrevista.codVaga),
+        data: novaEntrevista.data,
+        status: parseInt(novaEntrevista.status)
+      };
+
+      const response = await fetch(`${API_URL}/entrevista`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+      });
+
+      const result = await response.text();
+
+      if (response.ok) {
+        showToast("Entrevista inserida com sucesso!", "success");
+        carregarDados("tb_entrevista");
+        setNovaEntrevista({
+          codEstudante: "",
+          codVaga: "",
+          data: "",
+          status: "0"
+        });
+      } else {
+        showToast(result, "error");
+      }
+    } catch (err) {
+      showToast("Erro ao inserir entrevista: " + err.message, "error");
+    }
+  };
+
+
   // ===================== RENDER RESULT =====================
   const renderResult = () => {
     if (!dados) return null;
@@ -1131,6 +1212,72 @@ const JBDC = () => {
             </button>
           </div>
         )}
+
+       {tabelaSelecionada === "tb_entrevista" && (
+        <div className="form-card">
+          <h2>Inserir Nova Entrevista</h2>
+          <div className="form-grid">
+
+            {/* Selecionar Estudante */}
+            <select
+              value={novaEntrevista.codEstudante}
+              onChange={(e) =>
+                setNovaEntrevista({
+                  ...novaEntrevista,
+                  codEstudante: e.target.value
+                })
+              }
+              className="form-input"
+            >
+              <option value="">Selecione um Estudante</option>
+              {estudantes.map((estudante) => (
+                <option
+                  key={estudante.cod_estudante}
+                  value={estudante.cod_estudante}
+                >
+                  {estudante.primeiro_nome} {estudante.segundo_nome}
+                </option>
+              ))}
+            </select>
+
+            {/* Selecionar Vaga */}
+            <select
+              value={novaEntrevista.codVaga}
+              onChange={(e) =>
+                setNovaEntrevista({
+                  ...novaEntrevista,
+                  codVaga: e.target.value
+                })
+              }
+              className="form-input"
+            >
+              <option value="">Selecione uma Vaga</option>
+              {vagas.map((vaga) => (
+                <option key={vaga.cod_vaga} value={vaga.cod_vaga}>
+                  {vaga.titulo} — {vaga.nome_empresa}
+                </option>
+              ))}
+            </select>
+
+            {/* Data */}
+            <input
+              type="date"
+              value={novaEntrevista.data}
+              onChange={(e) =>
+                setNovaEntrevista({
+                  ...novaEntrevista,
+                  data: e.target.value
+                })
+              }
+              className="form-input"
+            />
+          </div>
+
+          <button onClick={inserirEntrevista} className="btn-primary">
+            Salvar Entrevista
+          </button>
+        </div>
+      )}
 
         {/* ===================== TABELA ATUALIZADA ===================== */}
         <div className="results-section">
