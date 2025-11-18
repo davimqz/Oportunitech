@@ -51,44 +51,59 @@ public class SqlController {
      * Suporta stored procedures, functions e triggers
      */
     @PostMapping("/execute")
-    public ResponseEntity<?> executeSql(@RequestBody Map<String, String> body) {
-        String sql = body.get("sql");
-        if (sql == null || sql.isBlank()) {
-            return ResponseEntity.badRequest().body("❌ Nenhum SQL informado.");
+    public ResponseEntity<?> executeSql(@RequestBody Map<String, String> request) {
+        String sql = request.get("sql");
+        
+        if (sql == null || sql.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("SQL vazio.");
         }
 
-        try {
-            String sqlClean = sql.trim();
-            String sqlLower = sqlClean.toLowerCase();
+        String cleanSql = sql.trim().toLowerCase();
 
-            // Verificar se é uma consulta (SELECT, SHOW, DESCRIBE, EXPLAIN)
-            if (isQueryCommand(sqlLower)) {
-                List<Map<String, Object>> result = jdbcTemplate.queryForList(sqlClean);
+        try {
+            // 1. Comandos que não retornam ResultSet
+            if (
+                cleanSql.startsWith("create") || 
+                cleanSql.startsWith("alter") ||
+                cleanSql.startsWith("drop") ||
+                cleanSql.startsWith("grant") ||
+                cleanSql.startsWith("revoke") ||
+                cleanSql.startsWith("truncate") ||
+                cleanSql.startsWith("insert") ||
+                cleanSql.startsWith("update") ||
+                cleanSql.startsWith("delete")
+            ) {
+                jdbcTemplate.update(sql);
+                return ResponseEntity.ok("Comando executado com sucesso.");
+            }
+
+            // 2. Blocos/Procedures/Triggers via DO $$
+            if (cleanSql.startsWith("do ") || cleanSql.contains("$$")) {
+                jdbcTemplate.execute(sql);
+                return ResponseEntity.ok("Bloco DO executado com sucesso.");
+            }
+
+            // 3. CALL procedure()
+            if (cleanSql.startsWith("call")) {
+                jdbcTemplate.update(sql);
+                return ResponseEntity.ok("Procedure executada com sucesso.");
+            }
+
+            // 4. SELECT de funções
+            if (cleanSql.startsWith("select")) {
+                List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
                 return ResponseEntity.ok(result);
             }
 
-            // Verificar se é criação de stored routine
-            if (isStoredRoutineCreation(sqlLower)) {
-                return executeStoredRoutineCreation(sqlClean);
-            }
+            // 5. Execuções desconhecidas → tenta update
+            jdbcTemplate.update(sql);
+            return ResponseEntity.ok("Comando executado.");
 
-            // Verificar se contém DELIMITER
-            if (sqlLower.contains("delimiter")) {
-                return executeWithDelimiter(sqlClean);
-            }
-
-            // Executar comando de modificação (INSERT, UPDATE, DELETE)
-            int updated = jdbcTemplate.update(sqlClean);
-            return ResponseEntity.ok("✅ Operação executada com sucesso. Linhas afetadas: " + updated);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("❌ Erro SQL: " + e.getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("❌ Erro ao executar: " + e.getMessage());
+            return ResponseEntity.status(400).body("Erro ao executar SQL: " + e.getMessage());
         }
     }
+
 
     /**
      * Lista todas as tabelas do banco de dados

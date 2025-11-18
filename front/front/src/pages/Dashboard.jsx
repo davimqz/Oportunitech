@@ -20,7 +20,6 @@ const Dashboard = () => {
 
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
-  // const API_URL = "https://oportunitech.onrender.com/api";
   const API_URL = "http://localhost:8080/sql";
 
   useEffect(() => {
