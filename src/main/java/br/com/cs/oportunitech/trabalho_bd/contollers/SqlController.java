@@ -387,6 +387,64 @@ public class SqlController {
     }
 
     // =====================================================================
+    // CRUD - ENTREVISTA
+    // =====================================================================
+
+    @PostMapping("/entrevista")
+    public ResponseEntity<String> inserirEntrevista(@RequestBody Map<String, Object> body) {
+        try {
+            if (body.get("codEstudante") == null)
+                return ResponseEntity.badRequest().body("❌ Código do estudante é obrigatório");
+
+            if (body.get("codVaga") == null)
+                return ResponseEntity.badRequest().body("❌ Código da vaga é obrigatório");
+
+            if (body.get("data") == null)
+                return ResponseEntity.badRequest().body("❌ Data é obrigatória");
+
+            Long codEstudante = Long.valueOf(body.get("codEstudante").toString());
+            Long codVaga = Long.valueOf(body.get("codVaga").toString());
+            String dataStr = body.get("data").toString(); // YYYY-MM-DD
+
+            String sql = "INSERT INTO tb_entrevista (cod_estudante, cod_vaga, data) " +
+                        "VALUES (?, ?, CAST(? AS DATE))";
+
+            jdbcTemplate.update(sql, codEstudante, codVaga, dataStr);
+
+            return ResponseEntity.ok("✅ Entrevista inserida com sucesso!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("❌ Erro ao inserir entrevista: " + e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/entrevistas")
+    public ResponseEntity<List<Map<String, Object>>> listarEntrevistas() {
+        try {
+            String sql = "SELECT * FROM tb_entrevista";
+            List<Map<String, Object>> result = jdbcTemplate.queryForList(sql);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    @GetMapping("/entrevista/{id}")
+    public ResponseEntity<?> buscarEntrevistaPorId(@PathVariable Long id) {
+        try {
+            String sql = "SELECT * FROM tb_entrevista WHERE cod_entrevista = ?";
+            Map<String, Object> result = jdbcTemplate.queryForMap(sql, id);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("❌ Erro ao buscar entrevista: " + e.getMessage());
+        }
+    }
+
+    // =====================================================================
     // CRUD - VAGA
     // =====================================================================
 
@@ -792,6 +850,7 @@ public class SqlController {
             case "tb_funcionario" -> "cod_funcionario";
             case "tb_departamento" -> "cod_dep";
             case "endereco" -> "cod_endereco";
+            case "tb_entrevista" -> "num_entrevista";
             default -> "id";
         };
     }
