@@ -19,8 +19,6 @@ const Dashboard = () => {
   });
 
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
-
-  // const API_URL = "https://oportunitech.onrender.com/api";
   const API_URL = "http://localhost:8080/sql";
 
   useEffect(() => {
@@ -48,8 +46,6 @@ const Dashboard = () => {
 
     buscarDados();
   }, []);
-
-  // Cálculos Estatísticos
   const calcularEstatisticas = (valores) => {
     if (!valores || valores.length === 0) return { media: 0, mediana: 0, moda: 0, variancia: 0, desvioPadrao: 0 };
     
@@ -73,7 +69,7 @@ const Dashboard = () => {
     return { media, mediana, moda: Number(moda), variancia, desvioPadrao };
   };
 
-  // Indicadores Resumidos
+  
   const indicadores = {
     totalEstudantes: dados.estudantes.length,
     totalEmpresas: dados.empresas.length,
@@ -88,7 +84,6 @@ const Dashboard = () => {
       : 0
   };
 
-  // 1. Gráfico de Distribuição de Idade dos Estudantes (Histograma)
   const distribuicaoIdade = () => {
     const idades = dados.estudantes.map(e => e.idade || 0).filter(i => i > 0);
     const faixas = {};
@@ -103,8 +98,6 @@ const Dashboard = () => {
       .map(([faixa, count]) => ({ faixa, quantidade: count }))
       .sort((a, b) => parseInt(a.faixa) - parseInt(b.faixa));
   };
-
-  // 2. Estatísticas de Idade (Média, Mediana, Moda)
   const estatisticasIdade = () => {
     const idades = dados.estudantes.map(e => e.idade || 0).filter(i => i > 0);
     const stats = calcularEstatisticas(idades);
@@ -122,8 +115,6 @@ const Dashboard = () => {
     
     dados.estudantes.forEach(est => {
       if (est.cod_curso) {
-        // Busca o nome do curso usando cod_curso
-        // Note que o ID na tabela de cursos pode ser 'cod_curso' ou 'id'
         const curso = dados.cursos.find(c => c.cod_curso === est.cod_curso || c.id === est.cod_curso);
         const nomeCurso = curso?.nome || `Curso ${est.cod_curso}`;
         distribuicao[nomeCurso] = (distribuicao[nomeCurso] || 0) + 1;
@@ -135,7 +126,6 @@ const Dashboard = () => {
     return Object.entries(distribuicao).map(([nome, value]) => ({ nome, value }));
   };
 
-  // 4. Vagas por Modalidade (Barras)
   const vagasPorModalidade = () => {
     const mapaModalidade = {
       0: 'Presencial',
@@ -159,7 +149,6 @@ const Dashboard = () => {
   };
 
 
-  // 5. Top 10 Empresas com Mais Vagas
   const empresasComMaisVagas = () => {
     const vagasPorEmpresa = {};
     dados.vagas.forEach(vaga => {
@@ -174,7 +163,6 @@ const Dashboard = () => {
   };
 
 
-  // 6. Análise de Carga Horária das Vagas
   const distribuicaoCargaHoraria = () => {
     const cargas = dados.vagas.map(v => v.carga_horaria || 0).filter(c => c > 0);
     const stats = calcularEstatisticas(cargas);
@@ -196,7 +184,6 @@ const Dashboard = () => {
     };
   };
 
-  // 7. Radar - Perfil dos Cursos (Duração vs Estudantes)
   const perfilCursos = () => {
   return dados.cursos.map(curso => {
     const qtdEstudantes = dados.estudantes.filter(
@@ -213,7 +200,6 @@ const Dashboard = () => {
 };
 
 
-  // 8. Linha do Tempo - Tendência de Vagas por Empresa
   const tendenciaVagas = () => {
     const vagasPorEmpresa = {};
     dados.vagas.forEach((vaga) => {
@@ -233,7 +219,6 @@ const Dashboard = () => {
       }));
   };
 
-  // 9. Variância e Desvio Padrão de Carga Horária
   const analiseVariancia = () => {
     const cargas = dados.vagas.map(v => v.carga_horaria || 0).filter(c => c > 0);
     const stats = calcularEstatisticas(cargas);
