@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react'; 
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell, AreaChart, Area } from 'recharts';
 import { TrendingUp, Users, Briefcase, GraduationCap, Building2, Filter } from 'lucide-react';
 
@@ -48,7 +48,41 @@ const Dashboard = () => {
     buscarDados();
   }, []);
 
-  // Cálculos Estatísticos
+  // ========================= FILTROS CORRIGIDOS ==========================
+
+  const mapaModalidade = {
+    0: "PRESENCIAL",
+    1: "REMOTO",
+    2: "HIBRIDO"
+  };
+
+  const dadosFiltrados = useMemo(() => {
+    let estudantes = [...dados.estudantes];
+    let vagas = [...dados.vagas];
+
+    // filtro por curso
+    if (filtros.cursoSelecionado !== "todos") {
+      estudantes = estudantes.filter(
+        (e) => String(e.cod_curso) === String(filtros.cursoSelecionado)
+      );
+    }
+
+    // filtro por modalidade de vagas
+    if (filtros.modalidadeSelecionada !== "todas") {
+      vagas = vagas.filter(
+        (v) => mapaModalidade[v.modalidades] === filtros.modalidadeSelecionada
+      );
+    }
+
+    return {
+      ...dados,
+      estudantes,
+      vagas
+    };
+  }, [dados, filtros]);
+
+  // ========================= ESTATÍSTICAS ==========================
+
   const calcularEstatisticas = (valores) => {
     if (!valores || valores.length === 0) return { media: 0, mediana: 0, moda: 0, variancia: 0, desvioPadrao: 0 };
     
@@ -72,24 +106,24 @@ const Dashboard = () => {
     return { media, mediana, moda: Number(moda), variancia, desvioPadrao };
   };
 
-  // Indicadores Resumidos
   const indicadores = {
-    totalEstudantes: dados.estudantes.length,
-    totalEmpresas: dados.empresas.length,
-    totalVagas: dados.vagas.length,
-    totalCursos: dados.cursos.length,
-    totalFuncionarios: dados.funcionarios.length,
-    mediaIdadeEstudantes: dados.estudantes.length > 0 
-      ? (dados.estudantes.reduce((acc, e) => acc + (e.idade || 0), 0) / dados.estudantes.length).toFixed(1)
+    totalEstudantes: dadosFiltrados.estudantes.length,
+    totalEmpresas: dadosFiltrados.empresas.length,
+    totalVagas: dadosFiltrados.vagas.length,
+    totalCursos: dadosFiltrados.cursos.length,
+    totalFuncionarios: dadosFiltrados.funcionarios.length,
+    mediaIdadeEstudantes: dadosFiltrados.estudantes.length > 0 
+      ? (dadosFiltrados.estudantes.reduce((acc, e) => acc + (e.idade || 0), 0) / dadosFiltrados.estudantes.length).toFixed(1)
       : 0,
-    vagasPorEmpresa: dados.empresas.length > 0
-      ? (dados.vagas.length / dados.empresas.length).toFixed(1)
+    vagasPorEmpresa: dadosFiltrados.empresas.length > 0
+      ? (dadosFiltrados.vagas.length / dadosFiltrados.empresas.length).toFixed(1)
       : 0
   };
 
-  // 1. Gráfico de Distribuição de Idade dos Estudantes (Histograma)
+  // ========================= GRÁFICOS ==========================
+
   const distribuicaoIdade = () => {
-    const idades = dados.estudantes.map(e => e.idade || 0).filter(i => i > 0);
+    const idades = dadosFiltrados.estudantes.map(e => e.idade || 0).filter(i => i > 0);
     const faixas = {};
     
     idades.forEach(idade => {
@@ -103,9 +137,8 @@ const Dashboard = () => {
       .sort((a, b) => parseInt(a.faixa) - parseInt(b.faixa));
   };
 
-  // 2. Estatísticas de Idade (Média, Mediana, Moda)
   const estatisticasIdade = () => {
-    const idades = dados.estudantes.map(e => e.idade || 0).filter(i => i > 0);
+    const idades = dadosFiltrados.estudantes.map(e => e.idade || 0).filter(i => i > 0);
     const stats = calcularEstatisticas(idades);
     
     return [
@@ -119,11 +152,9 @@ const Dashboard = () => {
   const estudantesPorCurso = () => {
     const distribuicao = {};
     
-    dados.estudantes.forEach(est => {
+    dadosFiltrados.estudantes.forEach(est => {
       if (est.cod_curso) {
-        // Busca o nome do curso usando cod_curso
-        // Note que o ID na tabela de cursos pode ser 'cod_curso' ou 'id'
-        const curso = dados.cursos.find(c => c.cod_curso === est.cod_curso || c.id === est.cod_curso);
+        const curso = dadosFiltrados.cursos.find(c => c.cod_curso === est.cod_curso || c.id === est.cod_curso);
         const nomeCurso = curso?.nome || `Curso ${est.cod_curso}`;
         distribuicao[nomeCurso] = (distribuicao[nomeCurso] || 0) + 1;
       } else {
@@ -134,17 +165,10 @@ const Dashboard = () => {
     return Object.entries(distribuicao).map(([nome, value]) => ({ nome, value }));
   };
 
-  // 4. Vagas por Modalidade (Barras)
   const vagasPorModalidade = () => {
-    const mapaModalidade = {
-      0: 'Presencial',
-      1: 'Remoto',
-      2: 'Hibrido'
-    };
-
     const distribuicao = {};
     
-    dados.vagas.forEach(vaga => {
+    dadosFiltrados.vagas.forEach(vaga => {
       const codigo = vaga.modalidades;
       const modalidade = mapaModalidade[codigo] || 'Não especificado';
       
@@ -157,11 +181,9 @@ const Dashboard = () => {
     }));
   };
 
-
-  // 5. Top 10 Empresas com Mais Vagas
   const empresasComMaisVagas = () => {
     const vagasPorEmpresa = {};
-    dados.vagas.forEach(vaga => {
+    dadosFiltrados.vagas.forEach(vaga => {
       const empresa = vaga.nome_empresa || 'Sem nome';
       vagasPorEmpresa[empresa] = (vagasPorEmpresa[empresa] || 0) + 1;
     });
@@ -172,10 +194,8 @@ const Dashboard = () => {
       .slice(0, 10);
   };
 
-
-  // 6. Análise de Carga Horária das Vagas
   const distribuicaoCargaHoraria = () => {
-    const cargas = dados.vagas.map(v => v.carga_horaria || 0).filter(c => c > 0);
+    const cargas = dadosFiltrados.vagas.map(v => v.carga_horaria || 0).filter(c => c > 0);
     const stats = calcularEstatisticas(cargas);
     
     const faixas = {};
@@ -195,27 +215,24 @@ const Dashboard = () => {
     };
   };
 
-  // 7. Radar - Perfil dos Cursos (Duração vs Estudantes)
   const perfilCursos = () => {
-  return dados.cursos.map(curso => {
-    const qtdEstudantes = dados.estudantes.filter(
-      (e) => e.cod_curso === curso.cod_curso || e.curso === curso.cod_curso
-    ).length;
+    return dadosFiltrados.cursos.map(curso => {
+      const qtdEstudantes = dadosFiltrados.estudantes.filter(
+        (e) => e.cod_curso === curso.cod_curso || e.curso === curso.cod_curso
+      ).length;
 
-    return {
-      curso: curso.nome ? curso.nome.substring(0, 19) : 'Sem nome',
-      duracao: curso.duracao || 0,
-      estudantes: qtdEstudantes,
-      popularidade: qtdEstudantes > 0 ? Math.min(100, qtdEstudantes * 10) : 0
-    };
-  }).filter(c => c.duracao > 0);
-};
+      return {
+        curso: curso.nome ? curso.nome.substring(0, 19) : 'Sem nome',
+        duracao: curso.duracao || 0,
+        estudantes: qtdEstudantes,
+        popularidade: qtdEstudantes > 0 ? Math.min(100, qtdEstudantes * 10) : 0
+      };
+    }).filter(c => c.duracao > 0);
+  };
 
-
-  // 8. Linha do Tempo - Tendência de Vagas por Empresa
   const tendenciaVagas = () => {
     const vagasPorEmpresa = {};
-    dados.vagas.forEach((vaga) => {
+    dadosFiltrados.vagas.forEach((vaga) => {
       const empresa = vaga.nome_empresa || 'Sem nome';
       if (!vagasPorEmpresa[empresa]) {
         vagasPorEmpresa[empresa] = 0;
@@ -232,9 +249,8 @@ const Dashboard = () => {
       }));
   };
 
-  // 9. Variância e Desvio Padrão de Carga Horária
   const analiseVariancia = () => {
-    const cargas = dados.vagas.map(v => v.carga_horaria || 0).filter(c => c > 0);
+    const cargas = dadosFiltrados.vagas.map(v => v.carga_horaria || 0).filter(c => c > 0);
     const stats = calcularEstatisticas(cargas);
     
     return [
@@ -247,6 +263,8 @@ const Dashboard = () => {
 
   const CORES = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
 
+
+  // ========================= INTERFACE ==========================
   return (
     <div className="dashboard-container">
       <div className="dashboard-content">
@@ -268,7 +286,7 @@ const Dashboard = () => {
                   className="filtro-select"
                 >
                   <option value="todos">Todos os Cursos</option>
-                  {dados.cursos.map(curso => (
+                  {dadosFiltrados.cursos.map(curso => (
                     <option key={curso.cod_curso} value={curso.cod_curso}>{curso.nome}</option>
                   ))}
                 </select>
@@ -333,7 +351,6 @@ const Dashboard = () => {
         {/* Gráficos */}
         <div className="graficos-grid">
           
-          {/* Gráfico 1: Distribuição de Idade */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">📈 Distribuição de Idade dos Estudantes</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -347,7 +364,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 2: Estatísticas de Idade */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">📊 Medidas Estatísticas - Idade</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -361,7 +377,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 3: Estudantes por Curso */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">🎓 Distribuição de Estudantes por Curso</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -385,7 +400,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 4: Vagas por Modalidade */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">💼 Vagas por Modalidade</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -399,7 +413,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 5: Top Empresas */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">🏢 Top 10 Empresas com Mais Vagas</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -413,7 +426,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 6: Carga Horária */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">⏰ Distribuição de Carga Horária</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -427,7 +439,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 7: Radar Cursos */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">🎯 Perfil dos Cursos</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -441,7 +452,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 8: Tendência Vagas */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">📈 Vagas por Empresa (Ranking)</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -455,7 +465,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 9: Análise de Variância */}
           <div className="grafico-card grafico-card-full">
             <h3 className="grafico-titulo">📉 Análise de Variância - Carga Horária</h3>
             <ResponsiveContainer width="100%" height={300}>
