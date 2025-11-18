@@ -237,7 +237,6 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <div className="dashboard-content">
     
-        {/* Filtros */}
         <div className="filtros-container">
           <button onClick={() => setMostrarFiltros(!mostrarFiltros)} className="filtros-toggle">
             <Filter size={20} />
@@ -277,7 +276,6 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Cards de Indicadores */}
         <div className="indicadores-grid">
           <div className="indicador-card">
             <div className="indicador-header">
@@ -316,10 +314,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Gráficos */}
         <div className="graficos-grid">
           
-          {/* Gráfico 1: Distribuição de Idade */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">📈 Distribuição de Idade dos Estudantes</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -333,7 +329,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 2: Estatísticas de Idade */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">📊 Medidas Estatísticas - Idade</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -347,7 +342,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 3: Estudantes por Curso */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">🎓 Distribuição de Estudantes por Curso</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -371,7 +365,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 4: Vagas por Modalidade */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">💼 Vagas por Modalidade</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -385,7 +378,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 5: Top Empresas */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">🏢 Top 10 Empresas com Mais Vagas</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -399,7 +391,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 6: Carga Horária */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">⏰ Distribuição de Carga Horária</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -413,7 +404,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 7: Radar Cursos */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">🎯 Perfil dos Cursos</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -427,7 +417,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 8: Tendência Vagas */}
           <div className="grafico-card">
             <h3 className="grafico-titulo">📈 Vagas por Empresa (Ranking)</h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -441,7 +430,6 @@ const Dashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Gráfico 9: Análise de Variância */}
           <div className="grafico-card grafico-card-full">
             <h3 className="grafico-titulo">📉 Análise de Variância - Carga Horária</h3>
             <ResponsiveContainer width="100%" height={300}>

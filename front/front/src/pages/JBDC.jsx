@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle, XCircle, AlertCircle, X } from 'lucide-react';
 
-// Componente de Notificação Toast
 const Toast = ({ message, type, onClose }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,7 +26,6 @@ const Toast = ({ message, type, onClose }) => {
   );
 };
 
-// Container de Toasts
 const ToastContainer = ({ toasts, removeToast }) => {
   return (
     <div className="toast-container">
@@ -43,7 +41,6 @@ const ToastContainer = ({ toasts, removeToast }) => {
   );
 };
 
-// Modal de Confirmação
 const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
   return (
     <div className="confirm-overlay">
@@ -153,7 +150,6 @@ const JBDC = () => {
   });
 
 
-  // Sistema de Notificações
   const showToast = (message, type = 'success') => {
     const id = Date.now();
     setToasts(prev => [...prev, { id, message, type }]);
@@ -179,7 +175,6 @@ const JBDC = () => {
     });
   };
 
-  // ===================== CARREGAR DADOS INICIAIS =====================
   useEffect(() => {
     fetch(`${API_URL}/tables`)
       .then(async res => {
@@ -358,7 +353,6 @@ const JBDC = () => {
     }
   };
 
-  // ===================== INSERIR ESTUDANTE =====================
   const inserirEstudante = async () => {
     try {
       if (!novoEstudante.email || !novoEstudante.primeiroNome) {
@@ -402,7 +396,6 @@ const JBDC = () => {
     }
   };
 
-  // ===================== INSERIR CURSO =====================
   const inserirCurso = async () => {
     try {
       if (!novoCurso.nome) {
@@ -441,7 +434,6 @@ const JBDC = () => {
     }
   };
 
-  // ===================== INSERIR EMPRESA =====================
   const inserirEmpresa = async () => {
     try {
       if (!novaEmpresa.nome) {
@@ -527,7 +519,6 @@ const JBDC = () => {
     }
   };
 
-  // ===================== INSERIR VAGA =====================
   const inserirVaga = async () => {
     try {
       if (!novaVaga.titulo) {
@@ -587,7 +578,6 @@ const JBDC = () => {
     }
   };
 
-  // ===================== INSERIR FUNCIONÁRIO =====================
   const inserirFuncionario = async () => {
     try {
       if (!novoFuncionario.primeiroNome) {
@@ -688,7 +678,6 @@ const JBDC = () => {
     }
   };
 
-  // ===================== INSERIR DEPARTAMENTO =====================
   const inserirDepartamento = async () => {
     try {
       if (!novoDepartamento.nome) {
@@ -767,7 +756,6 @@ const JBDC = () => {
   };
 
 
-  // ===================== RENDER RESULT =====================
   const renderResult = () => {
     if (!dados) return null;
 
@@ -856,7 +844,6 @@ const JBDC = () => {
           </select>
         </div>
 
-        {/* ===================== ESTUDANTE ===================== */}
         {tabelaSelecionada === "tb_estudante" && (
           <div className="form-card">
             <h2>Inserir Novo Estudante</h2>
@@ -915,7 +902,6 @@ const JBDC = () => {
           </div>
         )}
 
-        {/* ===================== CURSO ===================== */}
         {tabelaSelecionada === "tb_curso" && (
           <div className="form-card">
             <h2>Inserir Novo Curso</h2>
@@ -950,7 +936,6 @@ const JBDC = () => {
           </div>
         )}
 
-        {/* ===================== EMPRESA ===================== */}
         {tabelaSelecionada === "tb_empresa" && (
           <div className="form-card">
             <h2>Inserir Nova Empresa</h2>
@@ -983,7 +968,6 @@ const JBDC = () => {
           </div>
         )}
 
-        {/* ===================== VAGA ===================== */}
         {tabelaSelecionada === "tb_vaga" && (
           <div className="form-card">
             <h2>Inserir Nova Vaga</h2>
@@ -1052,7 +1036,6 @@ const JBDC = () => {
           </div>
         )}
 
-        {/* ===================== FUNCIONÁRIO ===================== */}
         {tabelaSelecionada === "tb_funcionario" && (
           <div className="form-card">
             <h2>Inserir Novo Funcionário</h2>
@@ -1105,7 +1088,6 @@ const JBDC = () => {
           </div>
         )}
 
-        {/* ===================== ENDEREÇO ===================== */}
         {tabelaSelecionada === "endereco" && (
           <div className="form-card">
             <h2>Inserir Novo Endereço</h2>
@@ -1165,7 +1147,6 @@ const JBDC = () => {
           </div>
         )}
 
-        {/* ===================== DEPARTAMENTO ===================== */}
         {tabelaSelecionada === "tb_departamento" && (
           <div className="form-card">
             <h2>Inserir Novo Departamento</h2>
@@ -1218,7 +1199,6 @@ const JBDC = () => {
           <h2>Inserir Nova Entrevista</h2>
           <div className="form-grid">
 
-            {/* Selecionar Estudante */}
             <select
               value={novaEntrevista.codEstudante}
               onChange={(e) =>
