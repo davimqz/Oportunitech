@@ -211,3 +211,9 @@ O banco de dados conta com as seguintes entidades principais:
 Este projeto está sob a licença MIT.
 
 ⭐ Projeto desenvolvido como atividade acadêmica - Disciplina de Banco de Dados
+
+Grupo:
+- Caio Ferreira
+- Davi Marques
+- Luiz Claudio
+- Henrique Brito
