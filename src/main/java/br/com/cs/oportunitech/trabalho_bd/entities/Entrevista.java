@@ -21,10 +21,12 @@ import lombok.Setter;
 public class Entrevista {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long num_entrevista;
-    private LocalDate data;
-    
-} 
-    
+
+    private Long cod_estudante;
+    private Long cod_vaga;      
+
+    private LocalDate data;     
+}
 

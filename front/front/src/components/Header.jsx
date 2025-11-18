@@ -50,18 +50,6 @@ const Header = () => {
             </button>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="mobile-menu">
-            <nav className="mobile-nav">
-              <a href="/" className="mobile-nav-link">Início</a>
-              <a href="/graficos" className="mobile-nav-link">Graficos</a>
-              <a href="/sobre" className="mobile-nav-link">Sobre o Projeto</a>
-              <a href="/visualizar" className="mobile-nav-link">Visualizar SQL</a>
-            </nav>
-          </div>
-        )}
       </header>
     </div>
   );
