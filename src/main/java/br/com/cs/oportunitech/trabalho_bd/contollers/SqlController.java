@@ -27,10 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controller REST responsável por gerenciar operações SQL e CRUD
- * das entidades do sistema Oportunitech
- */
+
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/sql")
@@ -42,14 +39,6 @@ public class SqlController {
     @Autowired
     private DataSource dataSource;
 
-    // =====================================================================
-    // EXECUÇÃO GENÉRICA DE SQL
-    // =====================================================================
-
-    /**
-     * Executa comandos SQL arbitrários (SELECT, INSERT, UPDATE, DELETE, etc.)
-     * Suporta stored procedures, functions e triggers
-     */
     @PostMapping("/execute")
     public ResponseEntity<?> executeSql(@RequestBody Map<String, String> body) {
         String sql = body.get("sql");
@@ -61,23 +50,20 @@ public class SqlController {
             String sqlClean = sql.trim();
             String sqlLower = sqlClean.toLowerCase();
 
-            // Verificar se é uma consulta (SELECT, SHOW, DESCRIBE, EXPLAIN)
+    
             if (isQueryCommand(sqlLower)) {
                 List<Map<String, Object>> result = jdbcTemplate.queryForList(sqlClean);
                 return ResponseEntity.ok(result);
             }
 
-            // Verificar se é criação de stored routine
             if (isStoredRoutineCreation(sqlLower)) {
                 return executeStoredRoutineCreation(sqlClean);
             }
 
-            // Verificar se contém DELIMITER
             if (sqlLower.contains("delimiter")) {
                 return executeWithDelimiter(sqlClean);
             }
 
-            // Executar comando de modificação (INSERT, UPDATE, DELETE)
             int updated = jdbcTemplate.update(sqlClean);
             return ResponseEntity.ok("✅ Operação executada com sucesso. Linhas afetadas: " + updated);
 
@@ -142,14 +128,10 @@ public class SqlController {
         }
     }
 
-    // =====================================================================
-    // CRUD - ESTUDANTE
-    // =====================================================================
-
+  
     @PostMapping("/estudante")
     public ResponseEntity<String> inserirEstudante(@RequestBody Map<String, Object> body) {
         try {
-            // Validação dos campos obrigatórios
             if (body.get("email") == null || body.get("email").toString().isBlank()) {
                 return ResponseEntity.badRequest().body("❌ Email é obrigatório");
             }
@@ -219,10 +201,6 @@ public class SqlController {
         }
     }
 
-    // =====================================================================
-    // CRUD - CURSO
-    // =====================================================================
-
     @PostMapping("/curso")
     public ResponseEntity<String> inserirCurso(@RequestBody Map<String, Object> body) {
         try {
@@ -233,7 +211,7 @@ public class SqlController {
             Integer duracao = parseIntegerOrNull(body.get("duracao"), "Duração");
             Integer type = body.get("type") != null && !body.get("type").toString().isBlank()
                     ? Integer.parseInt(body.get("type").toString())
-                    : 0; // Default: Graduação
+                    : 0; 
 
             String sql = "INSERT INTO tb_curso (duracao, nome, type) VALUES (?, ?, ?)";
             int rows = jdbcTemplate.update(sql, duracao, body.get("nome"), type);
@@ -308,9 +286,6 @@ public class SqlController {
         }
     }
 
-    // =====================================================================
-    // CRUD - EMPRESA
-    // =====================================================================
 
     @PostMapping("/empresa")
     public ResponseEntity<?> inserirEmpresa(@RequestBody Map<String, Object> body) {
@@ -333,9 +308,8 @@ public class SqlController {
                 throw new RuntimeException("Não foi possível obter o ID da empresa.");
             }
 
-            // CORREÇÃO: converte para Number e depois para Long/Integer
             Number codEmpresaNumber = (Number) keys.get("cod_empresa");
-            Long codEmpresa = codEmpresaNumber.longValue(); // ou intValue()
+            Long codEmpresa = codEmpresaNumber.longValue(); 
 
             Map<String, Object> response = new HashMap<>();
             response.put("mensagem", "Empresa inserida com sucesso");
@@ -386,14 +360,10 @@ public class SqlController {
         }
     }
 
-    // =====================================================================
-    // CRUD - VAGA
-    // =====================================================================
-
+  
     @PostMapping("/vaga")
     public ResponseEntity<String> inserirVaga(@RequestBody Map<String, Object> body) {
         try {
-            // Validações
             if (body.get("titulo") == null || body.get("titulo").toString().isBlank()) {
                 return ResponseEntity.badRequest().body("❌ Título é obrigatório");
             }
@@ -407,11 +377,10 @@ public class SqlController {
                     : 0;
             Integer codEmpresa = Integer.parseInt(body.get("codEmpresa").toString());
 
-            // Buscar o nome da empresa
             String sqlBuscarEmpresa = "SELECT nome FROM tb_empresa WHERE cod_empresa = ?";
             String nomeEmpresa = jdbcTemplate.queryForObject(sqlBuscarEmpresa, String.class, codEmpresa);
 
-            // Inserir a vaga
+        
             String sql = "INSERT INTO tb_vaga (titulo, descricao, carga_horaria, modalidades, salario, " +
                          "cod_empresa, nome_empresa, logo_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             int rows = jdbcTemplate.update(sql,
@@ -472,16 +441,12 @@ public class SqlController {
         }
     }
 
-    // =====================================================================
-    // CRUD - FUNCIONÁRIO
-    // =====================================================================
-
     @PostMapping("/funcionario")
     public ResponseEntity<String> inserirFuncionario(@RequestBody Map<String, Object> body) {
         try {
             Integer cargo = body.get("cargo") != null && !body.get("cargo").toString().isBlank()
                     ? Integer.parseInt(body.get("cargo").toString())
-                    : 1; // Default
+                    : 1; 
 
             String sql = "INSERT INTO tb_funcionario (primeiro_nome, segundo_nome, email, cargo, cod_empresa) " +
                          "VALUES (?, ?, ?, ?, ?)";
@@ -513,9 +478,6 @@ public class SqlController {
         }
     }
 
-    // =====================================================================
-    // CRUD - DEPARTAMENTO
-    // =====================================================================
 
     @PostMapping("/departamento")
     public ResponseEntity<String> inserirDepartamento(@RequestBody Map<String, Object> body) {
@@ -594,14 +556,10 @@ public class SqlController {
         }
     }
 
-    // =====================================================================
-    // CRUD - ENDEREÇO
-    // =====================================================================
 
     @PostMapping("/endereco")
     public ResponseEntity<String> inserirEndereco(@RequestBody Map<String, Object> body) {
         try {
-            // Validações
             if (body.get("rua") == null || body.get("rua").toString().isBlank()) {
                 return ResponseEntity.badRequest().body("❌ Rua é obrigatória");
             }
@@ -645,13 +603,7 @@ public class SqlController {
         }
     }
 
-    // =====================================================================
-    // MÉTODOS AUXILIARES
-    // =====================================================================
 
-    /**
-     * Verifica se o comando SQL é uma consulta
-     */
     private boolean isQueryCommand(String sqlLower) {
         String[] queryCommands = {"select", "show", "describe", "explain"};
         for (String cmd : queryCommands) {
@@ -685,20 +637,16 @@ public class SqlController {
         return ResponseEntity.ok("✅ Estrutura criada com sucesso!");
     }
 
-    /**
-     * Preprocessa stored procedures/functions removendo problemas de sintaxe
-     */
+   
     private String preprocessStoredRoutine(String sql) {
         String processed = sql;
 
-        // Remover comandos DELIMITER
         processed = processed.replaceAll("(?i)DELIMITER\\s+\\S+\\s*", "");
 
-        // Remover delimitadores customizados no final ($$, //)
         processed = processed.replaceAll("\\$\\$\\s*$", "");
         processed = processed.replaceAll("//\\s*$", "");
 
-        // Garantir que termina sem ponto e vírgula extra
+        
         processed = processed.trim();
         if (!processed.endsWith("END")) {
             processed = processed.replaceAll(";\\s*$", "");
@@ -707,11 +655,9 @@ public class SqlController {
         return processed;
     }
 
-    /**
-     * Executa SQL que contém comandos DELIMITER
-     */
+   
     private ResponseEntity<?> executeWithDelimiter(String sql) throws SQLException {
-        // Extrair o delimitador customizado
+
         String delimiter = "$$";
         String[] lines = sql.split("\n");
 
@@ -725,7 +671,7 @@ public class SqlController {
             }
         }
 
-        // Remover linhas de DELIMITER
+        
         StringBuilder cleanSql = new StringBuilder();
         for (String line : lines) {
             if (!line.trim().toLowerCase().startsWith("delimiter")) {
@@ -733,7 +679,7 @@ public class SqlController {
             }
         }
 
-        // Dividir pelos delimitadores customizados
+     
         String[] statements = cleanSql.toString().split(java.util.regex.Pattern.quote(delimiter));
 
         try (Connection conn = Objects.requireNonNull(jdbcTemplate.getDataSource()).getConnection()) {
