@@ -32,9 +32,9 @@ O projeto utiliza uma arquitetura cliente-servidor com:
 - **Inserção de dados** através de formulários validados (Pagina JBDC)
 - **Atualização** de registros existentes (Pagina SQL)
 - **Exclusão** com confirmação para evitar perda de dados (Pagina JBDC)
-- **Triggers e Funções** (verificar_email_funcionario()) - Para testar, basta tentar inserir um funcionario com email invalido
-- **Views** - Podem ser encontradas na pagina 'Visualizar', para meios de identificação, todas começam com 'vw'.
-- **Consultas SQL personalizadas** com interface interativa (Pagina SQL)
+- **Triggers e Funções** (verificar_email_funcionario()) - Para testar, basta tentar inserir um funcionario com email invalido (Página JBDC)
+- **Views** - Podem ser encontradas na página Visualizar. Para facilitar a identificação, todas começam com vw_. (Página Visualizar)
+- **Consultas SQL personalizadas** - Página dedicada a consultas mais específicas (Página SQL).
 
 ### 📊 Dashboard Interativo
 - Gráficos dinâmicos com dados em tempo real do banco
