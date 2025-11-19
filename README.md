@@ -28,11 +28,10 @@ O projeto utiliza uma arquitetura cliente-servidor com:
 ## ✨ Funcionalidades
 
 ### 🗄️ Gerenciamento de Banco de Dados
-- **Consultas SQL personalizadas** com interface interativa
-- **Inserção de dados** através de formulários validados
-- **Atualização** de registros existentes
-- **Exclusão** com confirmação para evitar perda de dados
-- Demonstração prática de **operações CRUD**
+- **Consultas SQL personalizadas** com interface interativa (Pagina SQL)
+- **Inserção de dados** através de formulários validados (Pagina JBDC)
+- **Atualização** de registros existentes (Pagina SQL)
+- **Exclusão** com confirmação para evitar perda de dados (Pagina JBDC)
 
 ### 📊 Dashboard Interativo
 - Gráficos dinâmicos com dados em tempo real do banco
