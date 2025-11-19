@@ -28,10 +28,13 @@ O projeto utiliza uma arquitetura cliente-servidor com:
 ## ✨ Funcionalidades
 
 ### 🗄️ Gerenciamento de Banco de Dados
-- **Consultas SQL personalizadas** com interface interativa (Pagina SQL)
+- **Consultas** com interface interativa (Pagina Visualizar)
 - **Inserção de dados** através de formulários validados (Pagina JBDC)
 - **Atualização** de registros existentes (Pagina SQL)
 - **Exclusão** com confirmação para evitar perda de dados (Pagina JBDC)
+- **Triggers e Funções** (verificar_email_funcionario()) - Para testar, basta tentar inserir um funcionario com email invalido
+- **Views** - Podem ser encontradas na pagina 'Visualizar', para meios de identificação, todas começam com 'vw'.
+- **Consultas SQL personalizadas** com interface interativa (Pagina SQL)
 
 ### 📊 Dashboard Interativo
 - Gráficos dinâmicos com dados em tempo real do banco
@@ -119,25 +122,6 @@ yarn dev
 ```
 
 4. Acesse a aplicação em `http://localhost:5173`
-
-## 🎯 Como Usar
-
-### Para Administradores
-
-1. **Acesse o painel de gerenciamento** para realizar operações no banco de dados
-2. **Visualize o dashboard** para análise de métricas e estatísticas
-3. **Gerencie vagas** adicionando, editando ou removendo oportunidades
-4. **Acompanhe candidatos** através da lista de estudantes
-
-### Para Estudantes
-
-1. **Preencha o formulário de cadastro** com suas informações
-2. **Navegue pelas vagas disponíveis** e encontre oportunidades compatíveis
-3. **Atualize seu perfil** conforme necessário
-
-## 📸 Screenshots
-
-[Adicione capturas de tela do seu projeto aqui]
 
 ## 🗂️ Estrutura do Projeto
 
